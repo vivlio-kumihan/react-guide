@@ -838,11 +838,16 @@ returnを無くしても構わないというルールがある。
 ```
 
 ## プロジェクトの作成方法
+
+### プロジェクトを新規作成
+
+```
 $ npx create-react-app {プロジェクト名}
 ↓
 $ cd {プロジェクト名}
 ↓
 $ npm start
+```
 
 `/package.json`の中つ使える命令が書かれている。
 
@@ -857,9 +862,24 @@ $ npm start
 
 `eject`はプロジェクトのあるディレクトにある隠しファイルを見えるようにする。
 
+```
+$ num run eject
+```
+
+scriptというディレクトリが増えたり、package.jsonの中身が変わったりする。
+
+本体を編集するには、`/src/App.js`。
+
+### jsonがあるディレクトリ
+
+```zsh
+$ npm install
+$ npm start
+```
+
 option + clickでブラウザが開く。
 
-```
+```zsh
 Compiled successfully!
 
 You can now view my-test-app in the browser.
@@ -867,8 +887,6 @@ You can now view my-test-app in the browser.
   Local:            http://localhost:3000
   On Your Network:  http://192.168.0.7:3000
 ```
-
-
 
 ### create-react-appドキュメント
 npm docs create-react-app
@@ -880,9 +898,116 @@ Set-ExecutionPolicy RemoteSigned
 ```
 
 ### その他
+開発は、フレーム・ワークの`Vite`か`Next.js`を使うのが一般的。
+
 [Vite](https://ja.vitejs.dev/) というモジュールバンドラーを使ったプロジェクトの作成
+
+プロジェクトを作成
 
 ```bash
 npm create vite@latest
+```
+
+プロジェクトのディレクトリからアプリを立ち上げる
+
+```bash
+npm run dev
+```
+Compiled with warnings.
+
+[eslint] 
+src/030_useState_render/end/Example.js
+  Line 5:7:   'displayVal' is defined but never used       no-unused-vars
+  Line 6:14:  'setVal' is assigned a value but never used  no-unused-vars
+
+src/030_useState_render/start/Example.js
+  Line 4:7:  'displayVal' is defined but never used  no-unused-vars
+
+src/050_prev_state/start/Example.js
+  Line 1:10:  'useState' is defined but never used  no-unused-vars
+
+src/060_state_object/start/Example.js
+  Line 1:10:  'useState' is defined but never used            no-unused-vars
+  Line 4:9:   'personObj' is assigned a value but never used  no-unused-vars
+
+src/064_state_array/start/Example.js
+  Line 2:9:  'numArray' is assigned a value but never used  no-unused-vars
+
+src/068_practice_obj_state/start/Example.js
+  Line 5:17:  'setOrder' is assigned a value but never used  no-unused-vars
+
+src/090_practice_state_props/start/Example.js
+  Line 14:7:  'CountResult' is assigned a value but never used  no-unused-vars
+  Line 16:7:  'CountUpdate' is assigned a value but never used  no-unused-vars
+
+src/App.js
+  Line 2:47:  'StrictMode' is defined but never used  no-unused-vars
+
+Search for the keywords to learn more about each warning.
+To ignore, add // eslint-disable-next-line to the line before.
+
+WARNING in [eslint] 
+src/030_useState_render/end/Example.js
+  Line 5:7:   'displayVal' is defined but never used       no-unused-vars
+  Line 6:14:  'setVal' is assigned a value but never used  no-unused-vars
+
+src/030_useState_render/start/Example.js
+  Line 4:7:  'displayVal' is defined but never used  no-unused-vars
+
+src/050_prev_state/start/Example.js
+  Line 1:10:  'useState' is defined but never used  no-unused-vars
+
+src/060_state_object/start/Example.js
+  Line 1:10:  'useState' is defined but never used            no-unused-vars
+  Line 4:9:   'personObj' is assigned a value but never used  no-unused-vars
+
+src/064_state_array/start/Example.js
+  Line 2:9:  'numArray' is assigned a value but never used  no-unused-vars
+
+src/068_practice_obj_state/start/Example.js
+  Line 5:17:  'setOrder' is assigned a value but never used  no-unused-vars
+
+src/090_practice_state_props/start/Example.js
+  Line 14:7:  'CountResult' is assigned a value but never used  no-unused-vars
+  Line 16:7:  'CountUpdate' is assigned a value but never used  no-unused-vars
+
+src/App.js
+  Line 2:47:  'StrictMode' is defined but never used  no-unused-vars
+
+webpack compiled with 1 warning
+
+
+
+## スタイルを付ける
+
+__Example.js__
+
+```jsx
+// 2. CSSを定義する
+// 相対的な位置の情報が必要
+// この指定は、グローバル（= 一番弱い）であることに留意しておく。
+
+import "./Example.css"
+
+const Example = () => {
+  return (
+    // 1. クラスを充てる
+    <div className="component">
+      <h3>スタイル変更　内容も変えた</h3>
+    </div>
+  );
+};
+
+export default Example;
+```
+
+__Example.css__
+
+```css
+.component {
+  padding: 1rem;
+  color: blue;
+  border: 5px solid red;
+}
 ```
 
