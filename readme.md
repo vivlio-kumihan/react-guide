@@ -913,70 +913,6 @@ npm create vite@latest
 ```bash
 npm run dev
 ```
-Compiled with warnings.
-
-[eslint] 
-src/030_useState_render/end/Example.js
-  Line 5:7:   'displayVal' is defined but never used       no-unused-vars
-  Line 6:14:  'setVal' is assigned a value but never used  no-unused-vars
-
-src/030_useState_render/start/Example.js
-  Line 4:7:  'displayVal' is defined but never used  no-unused-vars
-
-src/050_prev_state/start/Example.js
-  Line 1:10:  'useState' is defined but never used  no-unused-vars
-
-src/060_state_object/start/Example.js
-  Line 1:10:  'useState' is defined but never used            no-unused-vars
-  Line 4:9:   'personObj' is assigned a value but never used  no-unused-vars
-
-src/064_state_array/start/Example.js
-  Line 2:9:  'numArray' is assigned a value but never used  no-unused-vars
-
-src/068_practice_obj_state/start/Example.js
-  Line 5:17:  'setOrder' is assigned a value but never used  no-unused-vars
-
-src/090_practice_state_props/start/Example.js
-  Line 14:7:  'CountResult' is assigned a value but never used  no-unused-vars
-  Line 16:7:  'CountUpdate' is assigned a value but never used  no-unused-vars
-
-src/App.js
-  Line 2:47:  'StrictMode' is defined but never used  no-unused-vars
-
-Search for the keywords to learn more about each warning.
-To ignore, add // eslint-disable-next-line to the line before.
-
-WARNING in [eslint] 
-src/030_useState_render/end/Example.js
-  Line 5:7:   'displayVal' is defined but never used       no-unused-vars
-  Line 6:14:  'setVal' is assigned a value but never used  no-unused-vars
-
-src/030_useState_render/start/Example.js
-  Line 4:7:  'displayVal' is defined but never used  no-unused-vars
-
-src/050_prev_state/start/Example.js
-  Line 1:10:  'useState' is defined but never used  no-unused-vars
-
-src/060_state_object/start/Example.js
-  Line 1:10:  'useState' is defined but never used            no-unused-vars
-  Line 4:9:   'personObj' is assigned a value but never used  no-unused-vars
-
-src/064_state_array/start/Example.js
-  Line 2:9:  'numArray' is assigned a value but never used  no-unused-vars
-
-src/068_practice_obj_state/start/Example.js
-  Line 5:17:  'setOrder' is assigned a value but never used  no-unused-vars
-
-src/090_practice_state_props/start/Example.js
-  Line 14:7:  'CountResult' is assigned a value but never used  no-unused-vars
-  Line 16:7:  'CountUpdate' is assigned a value but never used  no-unused-vars
-
-src/App.js
-  Line 2:47:  'StrictMode' is defined but never used  no-unused-vars
-
-webpack compiled with 1 warning
-
-
 
 ## スタイルを付ける
 
@@ -1011,3 +947,86 @@ __Example.css__
 }
 ```
 
+## コンポーネントを分割する方法
+
+componentsディレクトリを作成
+Child.jsを作成
+  関数を作る
+  戻り値に値を設定する
+  出力する鍵を作成する
+Example.js
+  引き込み線を作る
+  札をはる
+中身を移す
+
+```js
+// default読み込みになっているので波括弧不要
+import Child from "./components/Child";
+// const Example = () => {
+//   return <Child />;
+// };
+// returnを省略する。
+const Example = () => <Child />
+
+export default Example;
+```
+
+```js
+// import "./Child.css";
+// import { List } from "./List";
+// const Example = () => {
+//   return (
+//     <div className="component">
+//       <h3>Hello Component</h3> 
+//       <List />
+//     </div>
+//   );
+// };
+
+// // `Example`という名称で`export`しているのに、
+// // `import`は`Child`はなぜ？
+// // `default export`の場合は、
+// // 読み込み先で名称を任意にできる。
+// // `Child.js`から読み込んでいるから
+// // `Child`にしているということ。
+// export default Example;
+
+// ただし、関数名とファイル名は合わせておいた方がいい。
+// ので関数名を変更して完成版とする。
+
+import "./Child.css"
+import { List } from "./List"
+
+const Child = () => {
+  return (
+    <div className="component">
+      <h3>Hello Component</h3> 
+      <List />
+    </div>
+  )
+}
+
+// default exportという。
+// 一つのファイルに一つのコンポーネントという考え方なので、
+// 基本的にはdefault exportで良い。
+// 複数のコンポーネントを出力したい場合に名前付きexportとなる。
+export default Child
+```
+
+```js
+const List = () => {
+  return (
+    <ul>
+      <li>item-1</li> 
+      <li>item-2</li>
+      <li>item-3</li>
+      <li>item-4</li>
+      <li>item-5</li>
+    </ul>
+  )
+}
+
+const a = 0
+// 名前付きexportという。
+export { List, a }
+```
