@@ -44,6 +44,10 @@ fileName.jsonがある階層で、
 アンインストールしたければ、
 `npm rm jquery`
 
+---
+
+# JS文法
+
 ## arrow関数
 
 関数を定義してみる。
@@ -507,3 +511,378 @@ console.log(resultD);
 console.log(resultE);
 console.log(resultF);
 ```
+
+## 非同期処理
+### 1. 非同期処理とは何か？
+
+__2秒待った後にコールバック関数を実行する基本形__
+
+`setTimeout(() => {}, 2000)`
+
+処理を上から下へ書いても順番通りに実行されない。
+このコードでは、setTimeout()関数を使っている箇所が非同期処理と呼ばれる。
+
+```js
+// 変数に0を代入。
+let num = 0
+// コンソールに出力
+console.log(`first time: ${ num }`)
+
+// 2秒後に実行する。
+setTimeout(() => {
+  num = 1
+}, 2000)
+
+// コンソールに出力
+console.log(`second time: ${ num } <- what num`)
+
+// result
+// first time: 0
+// main.js:16 second time: 0 <- what num
+```
+
+### 2. 非同期処理の中でコンソールログを書けないことがある。
+
+つまり非同期処理の中で出力するコードを書けないことがあるという意味。
+
+```js
+let num = 0
+console.log(`first time: ${ num }`)
+
+setTimeout(() => {
+  num = 1
+  console.log(num) // <= ここの非同期処理のこと
+}, 2000)
+
+console.log(`second time: ${ num } <- what num`)
+```
+
+### 3-1. 非同期処理が終わった後に処理をつなげるのが`promise`
+
+先ほども書いたが、非同期処理の中で出力するコードを書けない時に使う方法。
+だから出力順番として結果は`2`と同じ。
+
+```js
+let num = 0
+console.log(`first time: ${ num }`)
+
+// Promiseのインスタンス化を行う。引数には、コール・バック関数をとる。
+// コール・バック関数には、`resolve, reject`という2つの関数が引数として渡ってくる。
+// このインスタンスの中へ非同期処理を埋め込む。
+new Promise((resolve, reject) => {
+  setTimeout(() => {
+    num = 1
+    // 非同期処理が終わったタイミングでresolve()関数が呼ばれ、
+    resolve()
+  }, 2000)
+  // まさに『その時』この箇所に書いたコールバック関数が実行される。
+}).then(() => {
+  console.log(`second time: ${ num } <- 非同期のnum`)
+})
+
+console.log(`third time: ${ num } <- 最初のnum`)
+```
+
+### 3-2. 解説がよくわからんが引数を明示することもできる。
+
+多分変数が複数になった場合を想定しているのだと思う。
+`resolve関数`の引数は`then関数`の引数と1:1で対応している。
+だから、引数名が違っても値を追跡できてる。
+これはどうだかわからないが、
+`then関数`の引数を一定のものにしておいて、
+`resolve関数側で振り返ることができる。
+
+```js
+let num = 0
+let str = "hello"
+console.log(`first time: ${ num }`)
+
+new Promise((resolve, reject) => {
+  setTimeout(() => {
+    num = 1
+    str = "good-bye"
+    resolve(str)
+  }, 2000)
+}).then((result) => {
+  console.log(`second time: ${ result } <- 非同期のnum`)
+})
+
+console.log(`third time: ${ num } <- 最初のnum`)
+```
+
+### 4. reject
+
+`reject()`関数を発火させると`catch()関数`が実行される。
+なんらかのエラーが発生した時に使うもの。`resolve()`関数と同時では使えない。
+
+```js
+let num = 0
+let str = "hello"
+console.log(`first time: ${ num }`)
+
+new Promise((resolve, reject) => {
+  setTimeout(() => {
+    num = 1
+    reject()
+    // resolve()
+  }, 2000)
+}).then(() => {
+  console.log(`second time: ${ num } <- 非同期のnum`)
+}).catch(() => {
+  console.log(`reject: ${ num }`)
+})
+
+console.log(`third time: ${ num } <- 最初のnum`)
+```
+
+### 5. then()関数の数珠繋ぎ
+
+then()関数は処理を処理を繋げることが出来る。その際には変数を返すことを忘れずに。
+
+```js
+let num = 0
+let str = "hello"
+console.log(`first time: ${ num }`)
+
+new Promise((resolve, reject) => {
+  setTimeout(() => {
+    num = 1
+    resolve(num)
+    // reject()
+  }, 2000)
+
+}).then((num) => {
+  console.log(`second time: ${ num } <- 非同期のnum`)
+  return num;
+}).then((num) => {
+  console.log(`second time: ${ num } <- 非同期のnum`)
+  return num;
+}).then((num) => {
+  console.log(`second time: ${ num } <- 非同期のnum`)
+}).catch(() => {
+  console.log(`reject: ${ num }`)
+})
+
+console.log(`third time: ${ num } <- 最初のnum`)
+```
+
+## 非同期処理（await, async）
+
+awaitキーワード then()関数の数珠繋ぎを簡略化する書き方
+
+1. __変数aを0で初期化。`init()`関数で、非同期処理をするための`Primise`は使われているが、`then()`関数がないので素通りして`consolo.log()`が出力される。__
+
+```js
+let a = 0;
+
+init() // => 0
+function init() {
+  new Promise((resolve) => {
+    setTimeout(() => {
+        a = 1;
+        resolve(a)
+    }, 2000);
+  })
+  console.log(a);
+}
+```
+
+2. __非同期処理の定義の前に`await`、それを定義する関数の前に`async`とそれぞれキーワードを付与する。__
+
+その1
+非同期処理で`resolve(a)`と引数を設定、出力`console.log(a)`で同じ引数を使う。
+```js
+let a = 0;
+
+init() // => 0
+async function init() {
+  await new Promise((resolve) => {
+    setTimeout(() => {
+        a = 1;
+        resolve(a)
+    }, 2000);
+  })
+  console.log(a);
+}
+```
+
+その2
+非同期処理でPromiseを変数に代入。その変数名を出力。本番はこちらのよう。
+```js
+let a = 0;
+
+init()
+async function init() {
+  const result = await new Promise((resolve) => {
+    setTimeout(() => {
+        a = 1;
+        resolve(a)
+    }, 2000);
+  })
+  console.log(result);
+}
+```
+
+3. __例外処理__
+
+意味が不明。これでは意味がない。
+
+```js
+let a = 0;
+
+init()
+async function init() {
+  // 例外処理を書く
+  // tryにエラーが発生するとした処理を書く。
+  // 意味がわからん。
+  try {
+    const result = await new Promise((resolve, reject) => {
+      setTimeout(() => {
+          a = 1;
+          // resolve(a)
+          reject(a)
+      }, 2000);
+    })
+    console.log(result);
+  } catch(e) {
+    console.log('catchが実行', e)
+  }
+}
+```
+
+ # run React
+
+## 1. Reactを起動させる
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <!-- とりあえずReactを使うためのもの -->
+  <script src="/libs/react.development.js"></script>
+  <script src="/libs/react-dom.development.js"></script>
+  <!-- JSXを使えるようにするためのもの -->
+  <script src="/libs/babel-standalone.js"></script>
+</head>
+<body>
+  <div id="app"></div>
+  <!-- JSの中でHTMLに似たものを使うためのものを指定する -->
+  <script type="text/babel">
+    // idが`app`の要素をインスタンス化。
+    const appEl = document.querySelector('#app')
+    // アプリケーションのルートとして
+    const root = ReactDOM.createRoot(appEl)
+    // 表現する。
+    root.render(
+      <h1>hello</h1>
+      )
+  </script>
+</body>
+</html>
+```
+
+## 2. 
+
+### コンポーネントを差し込む
+
+```html
+<div id="app"></div>
+<script type="text/babel">
+  const appEl = document.querySelector('#app')
+  const root = ReactDOM.createRoot(appEl)
+  // 関数コンポーネントの定義
+  function Example() {
+    return <h1>Hello React Components</h1>
+  }
+  // コンポーネントを差し込む
+  root.render(<Example />)
+</script>
+```
+### アロー関数でやってみる。
+
+変数に代入してみる。
+
+```html
+const Example = () => {
+  return <h1>Hello React Components</h1>
+}
+```
+
+複数行のJSXを書きたい場合は`()`で囲む。
+`()`は何かを一つにグループ化する`演算子`。
+JSXを包含する場合は、ラッパーで括って1行に見せないといけない。
+
+```js
+const Example = () => {
+  return (
+    <div>
+      <h1>Hello React</h1>
+      <p>first lesson</p>
+    </div>
+  )
+}
+```
+
+returnを無くしても構わないというルールがある。
+`{ return }`を省略可能。
+`{}`囲み => この場合は、アロー関数の中身のコードが入っていると定義してる。
+`()`囲み => 何かを一つにグループ化してるよと定義している。
+
+```js
+  const Example = () => (
+    <div>
+      <h1>Hello React</h1>
+      <p>first lesson</p>
+    </div>
+  )
+```
+
+## プロジェクトの作成方法
+$ npx create-react-app {プロジェクト名}
+↓
+$ cd {プロジェクト名}
+↓
+$ npm start
+
+`/package.json`の中つ使える命令が書かれている。
+
+```json
+"scripts": {
+  "start": "react-scripts start",
+  "build": "react-scripts build",
+  "test": "react-scripts test",
+  "eject": "react-scripts eject"
+},
+```
+
+`eject`はプロジェクトのあるディレクトにある隠しファイルを見えるようにする。
+
+option + clickでブラウザが開く。
+
+```
+Compiled successfully!
+
+You can now view my-test-app in the browser.
+
+  Local:            http://localhost:3000
+  On Your Network:  http://192.168.0.7:3000
+```
+
+
+
+### create-react-appドキュメント
+npm docs create-react-app
+
+Windowsの方でエラーが発生する方は以下のコマンドを実行してみてください。
+
+```powershell
+Set-ExecutionPolicy RemoteSigned
+```
+
+### その他
+[Vite](https://ja.vitejs.dev/) というモジュールバンドラーを使ったプロジェクトの作成
+
+```bash
+npm create vite@latest
+```
+
