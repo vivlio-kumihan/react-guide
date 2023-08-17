@@ -1478,3 +1478,265 @@ const Child = ({ color: col = 'green' }) => {
   );
 };
 ```
+
+### 色々な値をやり取りする
+
+#### 数値
+
+__親コンポーネント Example.js__
+
+```js
+import Child from "./components/Child";
+
+const Example = () => {
+  return (
+    <>
+      {/* 1. 数値を渡す。 */}
+      <Child num = { 123 }/>
+      {/* <Child color="red" /> */}
+    </>
+  )
+}
+export default Example;
+```
+
+__受ける子コンポーネント Child.js__
+
+```js
+import "./Child.css";
+
+// 2.『分割代入』で数値を受け取る。
+const Child = ({ color: col = 'green', num }) => {
+  return (
+    <div className={`component 　${ col }`}>
+      <h3>Hello Component</h3>
+      // 変数を貼り付ける。
+      <h3>{ num }</h3>
+    </div>
+  );
+};
+export default Child; 
+```
+
+#### 関数
+
+__Example.js__
+
+```js
+import Child from "./components/Child";
+
+const Example = () => {
+  // 文はreturnの前だったね。
+  // 1. 関数を定義して、
+  const hello = (arg) => `Hello ${ arg }`
+  return (
+    // 2. 複数値を渡す場合のやり方。
+    // helloという名前で関数を定義し、式を任意の名称の変数に代入する。
+    <>
+      <Child
+        num = { 123 }
+        fn = { hello }
+      />
+      {/* <Child color="red" /> */}
+    </>
+  )
+}
+export default Example;
+```
+
+__Child.js__
+
+```js
+import "./Child.css";
+
+// 3. 任意の名称をつけた変数を分割代入で受け取る。
+const Child = ({ color: col = 'green', num, fn }) => {
+  return (
+    <div className={`component ${ col }`}>
+      <h3>Hello Component</h3>
+      <h3>{ num }</h3>
+      {/* 4. JSXで展開する。 */}
+      <h3>{ fn("Paul") }</h3>
+    </div>
+  );
+};
+export default Child; 
+```
+
+#### 真偽値
+
+__Example.js__
+
+```js
+import Child from "./components/Child";
+
+const Example = () => {
+  const hello = (arg) => `Hello ${ arg }`
+  // 真偽値で`真`を送る場合は`bool`。
+  // `偽`を送る場合は`何も書かない`。
+  return (
+    <>
+      <Child
+        num = { 123 }
+        fn = { hello }
+        // bool
+      />
+      {/* <Child color="red" /> */}
+    </>
+  )
+}
+export default Example;
+```
+
+__Child.js__
+
+```js
+import "./Child.css";
+
+// 3. `bool`は、`true`。falseを送るには別名を作って対応する。
+//    `bool`を別名`bl`として`false`を格納しておき、boolを受信しなければ初期値の`false`を貼ることになり、
+//    `bool`を受信したら値を`true`に置き換えて貼り付ける。
+const Child = ({ color: col = 'green', num, fn, bool: bl = false }) => {
+  return (
+    <div className={`component ${ col }`}>
+      <h3>Hello Component</h3>
+      <h3>{ num }</h3>
+      <h3>{ fn("Paul") }</h3>
+      {/* 4. JSXで展開する。 */}
+      <h3>{ console.log(bl) }</h3>
+      {/* コンソールでの結果 => false */}
+      <h3>{ bl ? "true" : "false"}</h3>
+    </div>
+  );
+};
+export default Child; 
+```
+
+#### オブジェクト
+
+__Example.js__
+
+```js
+import Child from "./components/Child";
+
+const Example = () => {
+  const hello = (arg) => `Hello ${ arg }`
+  // オブジェクトを送信する。
+  return (
+    <>
+      <Child
+        num = { 123 }
+        fn = { hello }
+        obj = {{ name: 'takahiro', age: '58'}}
+      />
+      {/* <Child color="red" /> */}
+    </>
+  )
+}
+export default Example;
+```
+
+__Child.js__
+
+```js
+import "./Child.css";
+
+// オブジェクトを受信する。
+const Child = ({ color: col = 'green', num, fn, bool: bl = false, obj }) => {
+  return (
+    // オブジェクトを貼り付ける。
+    <div className={`component ${ col }`}>
+      <h3>Hello Component</h3>
+      <h3>{ num }</h3>
+      <h3>{ fn("Paul") }</h3>
+      <h3>{ console.log(bl) }</h3>
+      <h3>{ bl ? "true" : "false"}</h3>
+      {/* 4. JSXで展開する。 */}
+      <h3>{ obj.name + "は、今年で" + obj.age + "才"}</h3>
+      <h3>{ obj.name }は、今年で{ obj.age }才</h3>
+    </div>
+  );
+};
+export default Child; 
+```
+
+#### スプレッド演算子で展開して送信
+
+```js
+import Child from "./components/Child";
+
+const Example = () => {
+  const hello = (arg) => `Hello ${ arg }`
+  // オブジェクトを定義して、スプレッド演算子で展開し送信する。
+  const elem = { color: "red", num: 123}
+  return (
+    <>
+      <Child
+        { ...elem }
+        // color = { "red" }
+        // num = { 123 }
+        fn = { hello }
+        obj = {{ name: 'takahiro', age: '58'}}
+      />
+      {/* <Child color="red" /> */}
+    </>
+  )
+}
+export default Example;
+```
+
+#### ちょっと捻ったらボロボロ
+
+配列を送受信してみる。
+
+__Example.js__
+
+```js
+import Profile from "./components/Profile";
+
+// インスタンスの定義は外側でも構わない。
+// 値が２つしかないことに注意する。なんで設定されていない値が表現されているのか？
+// それって初期値だとすぐピンとこないといけない。
+const profile = [
+  { name: "Takashi", age: 19, country: "Japan" },
+  { name: "Jane", age: 28, country: "UK" },
+]
+// 最初はオブジェクトのキーを充てている。
+// 次はスプレッド構文で開いいている。
+// 初期設定値を促している。
+const Example = () => {
+  return (
+    <>
+      <Profile
+        name={profile[0].name}
+        age={profile[0].age}
+        country={profile[0].country}
+      />
+      <Profile {...profile[1]} />
+      <Profile />
+    </>
+  )
+}
+export default Example
+```
+
+__Profile.js__
+
+```js
+import "./Profile.css";
+
+// 分割代入で受信しないといけない。
+// それと、なんで受信側で雛形が用意されていないか、
+// それは、初期値で設定されていて、用意がなければ初期値が出力される段取りになっているから。
+// const Profile = (profile) => {
+const Profile = ({ name = "John Doe", age = "??", country = "Japan" }) => {
+  return (
+    <div className="profile">
+      <h3>name: { name }</h3>
+      <h3>age: { age }</h3>
+      <h3>country: { country }</h3>
+    </div>
+  );
+};
+export default Profile;
+```
