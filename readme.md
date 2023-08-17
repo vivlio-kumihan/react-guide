@@ -949,71 +949,36 @@ __Example.css__
 
 ## コンポーネントを分割する方法
 
-componentsディレクトリを作成
-Child.jsを作成
-  関数を作る
-  戻り値に値を設定する
-  出力する鍵を作成する
-Example.js
-  引き込み線を作る
-  札をはる
-中身を移す
+### その1
+
+親を`Example.js`として、
+`./components/List.js`をコンポーネントとして引き込む。
+
+__Example.js__
 
 ```js
-// default読み込みになっているので波括弧不要
-import Child from "./components/Child";
-// const Example = () => {
-//   return <Child />;
-// };
-// returnを省略する。
-const Example = () => <Child />
+// 任意のコンポーネントを引き込む。
+import { List } from "./components/List";
+// CSSを引き込む。
+import "./components/List.css"
 
-export default Example;
-```
-
-```js
-// import "./Child.css";
-// import { List } from "./List";
-// const Example = () => {
-//   return (
-//     <div className="component">
-//       <h3>Hello Component</h3> 
-//       <List />
-//     </div>
-//   );
-// };
-
-// // `Example`という名称で`export`しているのに、
-// // `import`は`Child`はなぜ？
-// // `default export`の場合は、
-// // 読み込み先で名称を任意にできる。
-// // `Child.js`から読み込んでいるから
-// // `Child`にしているということ。
-// export default Example;
-
-// ただし、関数名とファイル名は合わせておいた方がいい。
-// ので関数名を変更して完成版とする。
-
-import "./Child.css"
-import { List } from "./List"
-
-const Child = () => {
+// 関数定義
+const Example = () => {
   return (
+    // スタイリングに必須なクラス属性を付与する。
     <div className="component">
-      <h3>Hello Component</h3> 
+      <h1>lang list</h1>
+      // コンポーネントをはる。
       <List />
     </div>
   )
 }
-
-// default exportという。
-// 一つのファイルに一つのコンポーネントという考え方なので、
-// 基本的にはdefault exportで良い。
-// 複数のコンポーネントを出力したい場合に名前付きexportとなる。
-export default Child
+// 必須　default exportと宣言する。
+export default Example;
 ```
 
 ```js
+// コンポーネントのネタとなる関数を定義する。
 const List = () => {
   return (
     <ul>
@@ -1025,8 +990,491 @@ const List = () => {
     </ul>
   )
 }
+// 名前付きexport。
+// 貼り付ける相手側では`import`の際、`{}`で囲む必要あり。
+export { List }
+```
 
-const a = 0
-// 名前付きexportという。
-export { List, a }
+### その2
+
+Listコンポーネントを含む、Example親コンポーネントの本文部分をChildコンポーネントとして引き込む。
+
+- componentsディレクトリにChild.jsを作成
+  - Listコンポーネントを引き込む。
+  - HTML表現するためのCSSをChild.cssとして作成し必要なスタイルを移行する。CSSを引き込む。
+  - Exampleコンポーネントの関数をListコンポーネント全て移行する。
+  - Example -> Child 該当部を変更する。
+  - `default export`で出力する鍵を作成する。
+- Example.js
+  - 不要になった要素を削除する。
+  - 引き込み要素を貼り付ける。
+
+__Child.js__
+
+```js
+// CSSの引き込み
+import "./Child.css"
+// Listコンポーネントの引き込み
+import { List } from "./List";
+// 関数定義
+const Child = () => {
+  return (
+    Exampleコンポーネントの関数で定義した中身を丸ごと持ってくる。
+    <div className="component">
+      <h1>lang list</h1>
+      <List />
+    </div>
+  )
+}
+// defalut exportで出力する。
+export default Child
+```
+
+__Example.js__
+
+```js
+// Childコンポーネントを引きこむ。
+import Child from "./components/Child"
+// Childを貼る。
+const Example = () => {
+  return (
+    <Child />
+  )
+}
+// 省略形でかく。
+//     ↓
+const Example = () => <Child />
+
+export default Example;
+```
+
+### default export
+一つのファイルに一つのコンポーネントという考え方なので、基本的には`default export`で良い。
+一つのファイルに複数のコンポーネントを出力したい場合に`名前付export`となる。
+
+
+## 不要なタグを出力しないFragmentの使い方
+
+一つのルート要素で束ねられている必要がある。
+
+文章構造を構成するには不都合。いちいちルート要素を作成する必要があるから。
+
+`import React from "react"`で`React`を引き込み、`React.Fragment`要素で囲い込むことで解決できる。
+
+`React`に組み込まれている関数やコンポーネントを確認するには
+
+```
+console.log(React)
+```
+
+## 書き方
+
+### org
+
+```js
+import "./Child.css"
+import React from "react"
+
+const Child = () => {
+  return (
+    <React.Fragment>
+      <div className="component">
+        <h3>Hello Component</h3>
+      </div>
+      <h3>Hello Fragment</h3>
+      <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum, beatae cupiditate molestias illum quaerat aut numquam tempora. Facere eaque dolor harum labore? Amet, ipsa inventore. Culpa sequi quod repudiandae nulla.</p>
+    </React.Fragment>
+  );
+};
+
+export default Child;
+```
+
+### その　1　Fragmentだけ読み込むことができる。
+
+```js
+import "./Child.css"
+import { Fragment } from "react"
+
+const Child = () => {
+  return (
+    <Fragment>
+      <div className="component">
+        <h3>Hello Component</h3>
+      </div>
+      <h3>Hello Fragment</h3>
+      <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum, beatae cupiditate molestias illum quaerat aut numquam tempora. Facere eaque dolor harum labore? Amet, ipsa inventore. Culpa sequi quod repudiandae nulla.</p>
+    </Fragment>
+  );
+};
+
+export default Child;
+```
+
+###　その　2　Fragmentを省略できる。
+
+```js
+import "./Child.css"
+
+const Child = () => {
+  return (
+    <>
+      <div className="component">
+        <h3>Hello Component</h3>
+      </div>
+      <h3>Hello Fragment</h3>
+      <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum, beatae cupiditate molestias illum quaerat aut numquam tempora. Facere eaque dolor harum labore? Amet, ipsa inventore. Culpa sequi quod repudiandae nulla.</p>
+    </>
+  );
+};
+
+export default Child;
+```
+
+### Fragmentにはkey属性をつけることができる。
+
+説明は後で。
+
+## JSX内でJSコードを実行する。
+
+- JSを書くコンポーネント`Expression`を引きこむ。
+- 関数の中身を複数行に対応する書式に変更する。
+
+```js
+import Child from "./components/Child";
+import Expression from "./components/Expression";
+
+// 関数ではなく、コードのまとまりなので`()`で括るよ。
+const Example = () => (
+  // 1行形式なのでこれを複数行で処理できるよう`Fragment`を使う。
+  <>
+    <Child />
+    <Expression />
+  </>
+)
+export default Example;
+```
+
+普通のJS。
+まずは、変数を初期化して、JSXの中で変数展開する。
+超絶スッキリして気持ちいい。
+
+```js
+const Expression = () => {
+  const title = "Expression"
+  return <h3>Hello { title }</h3>
+}
+
+export default Expression
+```
+
+## JSX内でJSコードを実行する　{ 変数展開 }
+
+Reactは`{}`でJSコードを括弧って式として評価する。
+
+### 変数展開
+
+```js
+import './Expression.css'
+
+const Expression = () => {
+  const title = "Expression"
+  // コードのまとまりを`return`するから`()`必須だね。
+  return (
+    // 属性値に対しても変数展開ができる。
+    // しかも`""`で囲む必要ない。素晴らしい！
+    <div className={ title.toLowerCase() }>
+      <h3>Hello { title }</h3>
+    </div>
+  )
+}
+export default Expression
+```
+
+### 配列を出力する。
+
+```js
+import './Expression.css'
+
+const Expression = () => {
+  const title = "Expression"
+
+  // 配列を定義すると、
+  const lang = ['Ruby', 'Perl', 'JavaScript']
+
+  // コードのまとまりを`return`するから`()`必須だね。
+  return (
+    // 属性値に対しても変数展開ができる。
+    // しかも`""`で囲む必要ない。素晴らしい！
+    <div className={ title.toLowerCase() }>
+      <h3>Hello { title }</h3>
+      <h3>{ lang  }</h3>
+      // 文字列で出てくる。
+      //         ↓
+      // <h3>RubyPerlJavaScript</h3>
+    </div>
+  )
+}
+export default Expression
+```
+
+### 関数を埋め込んでみる
+
+```js
+import './Expression.css'
+
+const Expression = () => {
+  const title = "Expression"
+  // const greeting = (arg) => {
+  //   return `${ arg } Function`
+  // }
+  const greeting = (arg) => `${ arg } Function`
+  return (
+    <div className={ title.toLowerCase() }>
+      <h3>{ greeting("こんにちは") }</h3>
+    </div>
+  )
+}
+export default Expression
+```
+
+### コメント、JSX
+
+```js
+import './Expression.css'
+
+const Expression = () => {
+  const title = "Expression"
+  const jsx = <h3>JSX heading</h3>
+  return (
+    <div className={ title.toLowerCase() }>
+      <h3>{ /* コメントアウト */ }</h3>
+      {/* HTMLに見えるけどこれらは、JSX。
+          Reactは、JSのプログラミングコードとして認識。 */}
+      {/* JSを変数展開するコードで囲って出力されるのがその証拠。 */}
+      { <h3>JSX heading</h3> }
+      {/* 変数に裸のまま入れて、変数展開して出せてる。 */}
+      { jsx }
+    </div>
+  )
+}
+export default Expression
+```
+
+## 式と文の違い
+
+```js
+/* POINT 式と文
+式：何らかの値を返すもの（変数に代入できるもの）
+文：変数宣言、for文、if文、switch文やセミコロンで区切るもの。
+JSX内で使用できるのは`式`。
+*/
+
+import "./Child.css";
+
+const Child = () => {
+  // 1という式を変数に代入できる。
+  // `const num = 1`自体を変数に代入できないのでこれは文となる。
+  const num = 1
+  // 関数を実行できる。つまり式。
+  // const fn = () => {
+  //   return 'hello'
+  // }
+  const fn = () => 'hello'
+  // 等しいという状態を変数に代入できし、変数展開もできるので式。
+  // だが、warningが出るのでコメントアウトする。
+  // const flag = 1 === 1;
+  // ifは、変数に代入できないのでこれは文。
+  // const greet = if (true) { "hello"}
+  // 三項演算子はできるので式
+  const greet = false ? 'hello' : 'goodbye'
+  // 文は`return`の中で書かなければ問題はない。
+  // if, for, forEach...
+  // 関数
+  // whatName関数を定義するのは文。
+  const whatName = () => 'John'
+  // whatName()は式。なので変数に代入できる。
+  const name = whatName()
+  return (
+    <div className="component">
+      <h3>式と文</h3>
+      {/* なのでJSX内で変数展開できる。 */}
+      <h3>{ num }</h3>
+      <h3>{ fn() }</h3>
+      {/* だが、warningが出るのでコメントアウトする。 */}
+      {/* <h3>{ flag }</h3> */}
+      {/* <h3>{ 1 === 1 }</h3> */}
+      <h3>{ greet }</h3>
+      <h3>{ true ? 'hello' : 'goodbye' }</h3>
+      <h3>{ name }</h3>
+    </div>
+  );
+};
+export default Child;
+```
+
+## propsでコンポーネントに値を渡してみよう
+
+親から子へ値を渡すには`props`。
+propsで属性を渡してみる。
+
+__Child.js__
+
+```js
+import "./Child.css";
+
+// 1. `Child`コンポーネントの引数に`props`を設定する。
+const Child = (props) => {
+  // 3. 付与された属性が`props`経由で渡ってくる。
+  // console.log(props)
+  return (
+    <div className="component">
+      <h3>Hello　Component</h3>
+    </div>
+  );
+};
+export default Child;
+```
+
+__Example.js__
+
+```js
+import Child from "./components/Child";
+
+// 2. 差し込んだコンポーネントに属性を付与する。
+const Example = () => <Child color="red" />;
+
+export default Example;
+```
+
+クラスにクラスを追加する。
+
+```css
+.App-start .component {
+  padding: 1rem;
+  color: blue;
+  border: 5px solid blue;
+}
+
+/* 1. クラスを追加する。 */
+.App-start .component.red {
+  padding: 1rem;
+  color: red;
+  border: 5px solid red;
+}
+```
+
+__Child.js__
+
+```js
+const Child = (props) => {
+  return (
+    // 2. クラスの呼び出し部を式にする。
+    // 3. JSの文字列中の変数展開『``』で囲んで`${}`で開く。
+    // やってることは、HTML的に書くと`class="component red"`。
+    <div className={`component ${ props.color }`}>
+      <h3>Hello Component</h3>
+    </div>
+  );
+};
+```
+
+非常に素晴らしい書式でできる。
+
+Example.jsを変更して箱を増やしてみる。
+
+```js
+import Child from "./components/Child";
+
+const Example = () => {
+  return ( 
+    <>
+      <Child color="" />
+      <Child color="red" />
+    </>
+  )
+}
+export default Example;
+```
+
+ ### 分割代入でもっと短く
+
+ ```js
+ // propsはオブジェクト
+// こんな風に書いているが`<Child color="red" /> => { color: "red" }`という解釈なのだろう。
+// オブジェクトリテラルで分割代入してやる。
+const Child = ({ color }) => {
+  return (
+
+    <div className={`component ${ color }`}>
+      <h3>Hello Component</h3>
+    </div>
+  );
+};
+ ```
+
+ propsの初期値
+
+ ```js
+ import "./Child.css";
+
+// 初期値を設定してやると、
+const Child = ({ color = 'green' }) => {
+  return (
+
+    <div className={`component ${ color }`}>
+      <h3>Hello Component</h3>
+    </div>
+  );
+};
+export default Child;
+ ```
+
+ ```js
+ const Example = () => {
+  return (
+    <>
+      // 属性を設定しなければ
+      // propsの初期値が入る。
+      <Child />
+      <Child color="red" />
+    </>
+  )
+}
+ ```
+
+ ```css
+ .App-start .component {
+  padding: 1rem;
+  color: blue;
+  border: 5px solid blue;
+}
+
+.App-start .component.red {
+  padding: 1rem;
+  color: red;
+  border: 5px solid red;
+}
+
+/* クラスを追加する。 */
+.App-start .component.green {
+  padding: 1rem;
+  color: green;
+  border: 5px solid green;
+}
+```
+
+### propsの別名
+
+`color => col`として、関数内で別名として使える。
+
+```js
+const Child = ({ color: col = 'green' }) => {
+  return (
+
+    <div className={`component ${ col }`}>
+      <h3>Hello Component</h3>
+    </div>
+  );
+};
 ```
