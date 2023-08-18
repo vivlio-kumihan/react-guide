@@ -750,7 +750,7 @@ async function init() {
 }
 ```
 
- # run React
+# run React
 
 ## 1. Reactを起動させる
 
@@ -1397,7 +1397,7 @@ const Example = () => {
 export default Example;
 ```
 
- ### 分割代入でもっと短く
+### 分割代入でもっと短く
 
  ```js
  // propsはオブジェクト
@@ -1740,3 +1740,504 @@ const Profile = ({ name = "John Doe", age = "??", country = "Japan" }) => {
 };
 export default Profile;
 ```
+
+### 特別なプロパティ ~ props.children
+
+コンポーネントを親を介して他のコンポーネントに渡す方法。
+
+__Example.js__
+
+```js
+import Profile from "./components/Profile";
+import Container from "./components/Container";
+
+const profile = [
+  { name: "Takashi", age: 19, country: "Japan", color: "green" },
+  { name: "Jane", age: 28, country: "UK", color: "blue" },
+];
+
+// 通常は`<Container />`と書いてコンポーネントを読み込んできたが、
+// 終了タグを書いた場合、中身がchildrenとして渡る。
+// 1. `<Container></Container>`の間に`{ 1 }`を挿入して、
+const Example = () => {
+  return (
+    <div>
+      <Container title="Childrenとは？">
+        { 1 }
+      </Container>
+      {/* <Container title="Childrenとは？" /> */}
+    </div>
+  );
+};
+export default Example;
+```
+
+__Container.js__
+
+```js
+import "./Container.css";
+
+const Container = ({ title, children }) => {
+  // 2. コンソールで確認すると値が出力される。
+  console.log(children)
+  return (
+    <div className="container">
+      <h3>{title}</h3>
+    </div>
+  );
+};
+export default Container;
+```
+
+Profileを2つでも3つでも渡したければ、`Container`の中に渡すだけ。
+
+__Example.js__
+
+```js
+import Profile from "./components/Profile";
+import Container from "./components/Container";
+const profile = [
+  { name: "Takashi", age: 19, country: "Japan", color: "green" },
+  { name: "Jane", age: 28, country: "UK", color: "blue" },
+];
+
+const Example = () => {
+  return (
+    <div>
+      <Container title="Childrenとは？">
+        <Profile />
+        <Profile />
+      </Container>
+    </div>
+  );
+};
+export default Example;
+```
+
+__Container.js__
+
+```js
+import "./Container.css";
+
+const Container = ({ title, children }) => {
+  console.log(children)
+  return (
+    <div className="container">
+      <h3>{title}</h3>
+      { children }
+    </div>
+  );
+};
+export default Container;
+```
+
+profileで設定されたオブジェクトの中身を渡す。
+
+__Example.js__
+
+```js
+import Profile from "./components/Profile";
+import Container from "./components/Container";
+const profile = [
+  { name: "Takashi", age: 19, country: "Japan"},
+  { name: "Jane", age: 28, country: "UK", color: "red" },
+];
+
+// profileの中身を渡したければ、スプレッド構文で解決する。
+const Example = () => {
+  return (
+    <div>
+      <Container title="Childrenとは？">
+        <Profile { ...profile[0] } />
+        <Profile { ...profile[1] } />
+        <Profile />
+      </Container>
+    </div>
+  );
+};
+export default Example;
+```
+
+Childrenを属性として渡す。
+
+__Example.js__
+
+```js
+import Profile from "./components/Profile";
+import Container from "./components/Container";
+const profile = [
+  { name: "Takashi", age: 19, country: "Japan"},
+  { name: "Jane", age: 28, country: "UK", color: "red" },
+];
+
+// childrenは、属性としても渡せる。
+// コンポーネントもJSのオブジェクトなので属性の値として解決できる。
+// ただし、オブジェクトの中身を配列で渡す場合にキーを与えないといけない。
+// 渡すときは式として渡す？？？　多分、オブジェクトではないと思う。
+const Example = () => {
+  return (
+    <div>
+      {/* <Container title="Childrenとは？">
+        <Profile { ...profile[0] } />
+        <Profile { ...profile[1] } />
+        <Profile />
+      </Container> */}
+      <Container title="Childrenとは？" children={[
+        <Profile key={ profile[0].name } { ...profile[0] } />,
+        <Profile key={ profile[1].name } { ...profile[1] } />,
+      ]} />
+    </div>
+  );
+};
+export default Example;
+```
+
+別名でもできる。
+何が嬉しいのかというと、コンポーネントだけではなく、中の部品も任意の位置に自由にレイアウトできるということ。これはすごい！
+ちゃんとJSを理解してコードの流れや動きを追えるようになる必要はあるが、
+限りなく大きくなるレイアウトの自由度を獲得できる！
+
+__Example.js__
+
+```js
+import Profile from "./components/Profile";
+import Container from "./components/Container";
+const profile = [
+  { name: "Takashi", age: 19, country: "Japan"},
+  { name: "Jane", age: 28, country: "UK", color: "red" },
+];
+
+// 別名で渡すこともできる。
+// 1. `children`属性の次に`first`属性と任意の名称をつけて送信し、
+const Example = () => {
+  return (
+    <div>
+      <Container title="Childrenとは？" children={[
+        <Profile key={ profile[0].name } { ...profile[0] } />,
+        <Profile key={ profile[1].name } { ...profile[1] } />,
+      ]}
+      first={ <Profile key={ profile[0].name } { ...profile[0] } />}
+      second={ <Profile key={ profile[1].name } { ...profile[1] } />}
+      />
+    </div>
+  );
+};
+export default Example;
+```
+
+__Container.js__
+
+```js
+import "./Container.css";
+
+// 2. propsに先ほどの`first`を追加して、JSX内で貼り付けて解決。
+// 何が嬉しいのかというと、コンポーネントだけではなく、中の部品も
+// 任意の位置に自由にレイアウトできるということ。これはすごい！
+const Container = ({ title, children, first, second }) => {
+  console.log(children)
+  return (
+    <div className="container">
+      <h3>{title}</h3>
+      { children }
+      { second }
+      { first }
+    </div>
+  );
+};
+export default Container;
+```
+
+## propsの重要なルール
+
+### POINT propsの流れは一方通行
+
+繰り返しになるが、子コンポーネントに値を渡すには親コンポーネントから渡す。`Hello`と`Bye`両方の`name`に同じ値を送信するというのがReact。
+
+```js
+import Bye from "./components/Bye"
+import Hello from "./components/Hello"
+
+const Example = () => {
+  // 1. 変数を初期化して、
+  const name = 'John'
+  return (
+    <>
+      // 2. props経由で子コンポーネントへ渡す。
+      <Hello name={ name } />
+      <Bye name={ name } />
+    </>
+  );
+};
+export default Example;
+```
+
+__Hello.js, Bye.js__
+
+```js
+// Hello
+const Hello = (props) => {
+  return (
+    <div>
+      <h3>Hello { props.name }</h3>
+    </div>
+  );
+};
+export default Hello;
+
+// Bye
+const Bye = (props) => {
+  return (
+    <div>
+      <h3>Bye { props.name }</h3>
+    </div>
+  );
+};
+export default Bye;
+```
+
+### POINT propsは読み取り専用
+
+コンソールで警告される。
+読み取り専用だからプロパティーに値を与えることができないと。
+
+```js
+const Hello = (props) => {
+  // Cannot assign to read only property
+  // 'name' of object '#<Object>'
+  props.name = "takahiro"
+  return (
+    <div>
+      <h3>Hello { props.name }</h3>
+    </div>
+  );
+};
+export default Hello;
+```
+
+## JSXの正体
+
+JSXはJSのオブジェクトとして扱われる。
+
+- 変数に代入できる。
+- 他のコンポーネントのpropsとして渡すことができる。
+
+# イベントリスナーとステート（状態管理）
+
+## イベントに合わせて関数を実行する
+
+```js
+const Example = () => {
+  // イベントは色々ある。
+  // onMouseEnter
+  // onMouseLeave
+  // onChange
+  // onBlur
+
+  // `onClick`に対してコールバック関数`=()`を定義
+  // これをイベントハンドラーという。
+  // `onClick`というイベントのリスナーを
+  // `clickHandler`という名称で作成し登録する（引数にとる）。
+
+  // コールバック関数でやりがちなこと。
+  // - クリックしたら`clickHandler`というイベントハンドラーを呼ぶという意味。
+  // - クリックイベントの中に`clickHandler`関数が入っているので、クリックするしないに関わらずとりあえず関数実行するわという意味。
+  // `clickHandler` => `clickHandler`という名前の関数
+  // `clickHandler()` => `clickHandler`関数を実行する
+  // この違いを理解する。
+
+  // `<button onClick={ clickHandler() }>Click</button>`
+  // `JSX`が書かれた地点で関数を実行するという意味。
+  // イベントハンドラーには、関数の戻り値が設定される。
+  // 何が返されるか？
+  // ```js
+  //   const clickHandler = () => {
+  //      alert("on click button")
+  //   }
+  // ```
+  //  この関数には`return`が書かれていないから、
+  // `console.log(clickHandler())` => `undefined`
+
+  const clickHandler = () => {
+    alert("on click button")
+  }
+  
+  return (
+    <>
+    <button onClick={ clickHandler }>Click</button>
+    <button onClick={ clickHandler }>Click</button>
+    </>
+  );
+};
+export default Example;
+```
+
+## よく利用するイベント
+
+input要素でよく使われるイベント
+入力欄に値を入力する度にコールバック関数が実行される。
+`onChange={() => console.log("onChange検知")}`
+
+マウスが入力欄から離なし、他の部分をクリックしたら（フォーカスが離れたら）コールバック関数が実行される。
+`onBlur={() => console.log("onBlur検知")}`
+
+最初に入力欄をクリックしたら（フォーカスを得たら）コールバック関数が実行される。
+`onFocus={() => console.log("onFocus検知")}`
+
+`onChange`というイベントハンドラーに`e`というイベントを引数にとる。
+コールバック関数で`e.target.value`として入力値を獲得する。
+
+要素へマウスが入った時離れた時にイベントが実行される。
+
+```js
+const Example = () => {
+
+  return (
+    <div>
+      <label>
+        入力値のイベント：
+        <input
+          type="text"
+          onChange={() => console.log("onChange検知")}
+          onBlur={() => console.log("onBlur検知")}
+          onFocus={() => console.log("onFocus検知")} />
+      </label>
+      <div>
+        <label>
+          入力値を取得：
+          <input type="text" 
+            onChange={(e) => console.log(e.target.value)} />
+        </label>
+      </div>
+      <div
+        className="hover-event"
+        onMouseEnter={() => console.log("カーソルが入ってきました。")}
+        onMouseLeave={() => console.log("カーソルが出ていきました。")}
+      >
+        ホバーしてね！
+      </div>
+    </div>
+  )
+}
+export default Example
+```
+
+## ステート（状態管理）
+
+### その　1
+こんな風に考えるがこれではダメ。
+
+```js
+let tmpVal
+return (
+  <>
+    <input type="text"
+      onChange={(e) => {
+        tmpVal = e.target.value
+      }}
+    /> = { tmpVal }
+  </>
+)
+```
+
+### その　2
+`useState`を呼び込む。
+`useState`で値を初期化すると、読み込み用の値と関数がセットになった配列が返される。
+関数には今注目しているインスタンスに適用できるものが設定されている。
+その関数をコールバック関数として、引数に`e.target.value`を渡すと欲しい値が取れる寸法。
+`[value, function]`
+
+```js
+import { useState } from "react"
+import "./Example.css"
+
+const Example = () => {
+  let tmpVal = useState(0)
+  return (
+    <>
+      <input type="text"
+        onChange={(e) => {
+          const setFunc = tmpVal[1]
+          setFunc(e.target.value)
+        }}
+      /> = { tmpVal[0] }
+    </>
+  )
+}
+export default Example
+```
+
+### その　3
+分割代入で効率と判読性の向上
+`let [val, setFunc] = useState(0)`
+このように変更し、該当する箇所へ変数を入れ替え、不要なコードを取り去る。
+非常に読みやすくなる。素晴らしい！
+
+```js
+import { useState } from "react"
+import "./Example.css"
+
+const Example = () => {
+  let [val, setFunc] = useState(0)
+  return (
+    <>
+      <input type="text"
+        onChange={(e) => {
+          setFunc(e.target.value)
+        }}
+      /> = { val }
+    </>
+  )
+}
+export default Example
+```
+
+### その　4
+
+再レンダリングについて
+ダメ・コードで何が起こってたか？
+
+```js
+const Example = () => {
+  // 1. 初期化していない変数を設定
+  let tmpVal
+  return (
+    <>
+      <input type="text"
+        // 2. イベントにイベントリスナー設定
+        onChange={(e) => {
+          // 3. 入力というイベントが起こったらその入力値を変数に代入させる。
+          tmpVal = e.target.value
+        }}
+      // 4. ここで値を貼り付けられたらいいのだができない。
+      //    それは、イベントを駆動させると`Example`propsを再度実行する仕様だから。
+      //    再度実行ということは、`let tmpVal`の処理で変数の中身は空になり、
+      //    `{ tmpVal }`は、空の状態を出力する、つまり、反応していないように見えるというわけ。
+      /> = { tmpVal }
+    </>
+  )
+}
+```
+
+解決している様子を見る。
+
+```js
+// 1. 状態を保持してくれるものを引っ張ってくる。
+import { useState } from "react"
+const Example = () => {
+  // 2. インプットされる値を格納する変数（オブジェクト）を初期化する。
+  let [val, setFunc] = useState(0)
+  return (
+    <>
+      <input type="text"
+        onChange={(e) => {
+          // 3. セッターである`setFunc`に入力された値を引数にとり評価、値を設定と保持をする。
+          setFunc(e.target.value)
+        }}
+        // 4. 再度レンダリングされてから、保持している値をここに貼り付けという寸法。
+      /> = { val }
+    </>
+  )
+}
+export default Example
+```
+
