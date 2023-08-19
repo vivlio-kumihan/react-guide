@@ -2144,3 +2144,54 @@ const Example = () => {
 export default Example
 ```
 
+## 複数のステートに対応・ステートは最上位
+
+```js
+import { useState } from "react"
+import "./Example.css"
+
+// イベントごとに関数の引数に何が必要かが異なる。
+// それはそうだ、イベントごとに何を引数にとり、どのように動作させるかを定義しているのだから。
+// - onChangeは、e.target.valueをとる。
+// - onClickは、クリックした回数（数値）をどうするのか（式）をとる。
+// - 複数の作成に対応。変数・関数とも変更すれば解決。
+
+const Example = () => {
+  // コンポーネントの最上位の位置でしか呼ぶことができない。
+  let [countA, setCountA] = useState(0)
+  let [countB, setCountB] = useState(0)
+  let [countC, setCountC] = useState(0)
+  return (
+    <>
+      <label htmlFor="">clicked Button A, { countA } times </label>
+      <button type="button" 
+              onClick={() => {
+                setCountA(countA + 1)
+              }}
+      >
+        Button A
+      </button>
+
+      <label htmlFor="">clicked Button B, { countB } times </label>
+      <button type="button" 
+              onClick={() => {
+                setCountB(countB + 1)
+              }}
+      >
+        Button B
+      </button>
+
+      <label htmlFor="">clicked Button C, { countC } times </label>
+      <button type="button" 
+              onClick={() => {
+                setCountC(countC + 1)
+              }}
+      >
+        Button C
+      </button>
+    </>
+  )  
+};
+export default Example;
+
+```
