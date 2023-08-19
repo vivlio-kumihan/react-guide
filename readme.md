@@ -520,234 +520,137 @@ __2秒待った後にコールバック関数を実行する基本形__
 `setTimeout(() => {}, 2000)`
 
 処理を上から下へ書いても順番通りに実行されない。
-このコードでは、setTimeout()関数を使っている箇所が非同期処理と呼ばれる。
+このコードでは、setTimeout()関数を使っている箇所を非同期処理と呼ぶ。
+
+__非同期処理の最初の形__
 
 ```js
-// 変数に0を代入。
-let num = 0
-// コンソールに出力
-console.log(`first time: ${ num }`)
-
-// 2秒後に実行する。
-setTimeout(() => {
-  num = 1
-}, 2000)
-
-// コンソールに出力
-console.log(`second time: ${ num } <- what num`)
-
-// result
-// first time: 0
-// main.js:16 second time: 0 <- what num
+const Example = () => {
+  let num = 0
+  console.log(num) // 1番目に呼ばれる。
+  new Promise((resolve) => {
+    setTimeout(() => {
+      num = 1
+      console.log(num) // 3番目に呼ばれる。
+    }, 2000)
+  })
+  console.log(num) // 2番目に呼ばれる。
+  return <></> 
+}
+export default Example;
 ```
 
-### 2. 非同期処理の中でコンソールログを書けないことがある。
+### 2. Promise, resolve, then 非同期処理の中で出力を書けない場合の処理
 
-つまり非同期処理の中で出力するコードを書けないことがあるという意味。
+- Promiseのインスタンスを生成。
+- 引数にはコールバック関数。引数は`resolve（解決）`。
+- 非同期処理をコールバック関数の中に仕込んで、最終行で設定した変数を引数として`resolve()関数`を実行する。
+- 外に出したい出力の処理をコールバック関数として、`then()`関数の引数に入れる。
+- この時、仮引数には非同期処理で設定した変数が渡ってくる。
+- 出力の処理はメソッド・チェーンできる。
 
 ```js
-let num = 0
-console.log(`first time: ${ num }`)
-
-setTimeout(() => {
-  num = 1
-  console.log(num) // <= ここの非同期処理のこと
-}, 2000)
-
-console.log(`second time: ${ num } <- what num`)
+const Example = () => {
+  let num = 0
+  console.log(num)
+  new Promise((resolve) => {
+    setTimeout(() => {
+      num = 1
+      resolve(num)
+    }, 2000)
+  }).then((arg) => {
+    console.log(arg)
+  })
+  console.log(num)
+  return <></>  
+}
+export default Example;
 ```
 
-### 3-1. 非同期処理が終わった後に処理をつなげるのが`promise`
+### 3. Promise, reject, catch 非同期処理の中でエラー処理
 
-先ほども書いたが、非同期処理の中で出力するコードを書けない時に使う方法。
-だから出力順番として結果は`2`と同じ。
+中の動きの理屈は同じ。
+実践的なことは後で。とりあえずエラー処理がかけることを覚えておく。
 
 ```js
-let num = 0
-console.log(`first time: ${ num }`)
-
-// Promiseのインスタンス化を行う。引数には、コール・バック関数をとる。
-// コール・バック関数には、`resolve, reject`という2つの関数が引数として渡ってくる。
-// このインスタンスの中へ非同期処理を埋め込む。
-new Promise((resolve, reject) => {
-  setTimeout(() => {
-    num = 1
-    // 非同期処理が終わったタイミングでresolve()関数が呼ばれ、
-    resolve()
-  }, 2000)
-  // まさに『その時』この箇所に書いたコールバック関数が実行される。
-}).then(() => {
-  console.log(`second time: ${ num } <- 非同期のnum`)
-})
-
-console.log(`third time: ${ num } <- 最初のnum`)
+const Example = () => {
+  let num = 0
+  console.log(num)
+  new Promise((resolve, reject) => {
+    setTimeout(() => {
+      num = 1
+      // resolve(num)
+      reject(num)
+    }, 2000)
+  }).then((arg) => {
+    console.log(arg)
+  }).catch((err) => {
+    console.log('catchが実行された。')
+    console.log(err)
+  })
+  console.log(num)
+  return <></>  
+}
+export default Example;
 ```
 
-### 3-2. 解説がよくわからんが引数を明示することもできる。
-
-多分変数が複数になった場合を想定しているのだと思う。
-`resolve関数`の引数は`then関数`の引数と1:1で対応している。
-だから、引数名が違っても値を追跡できてる。
-これはどうだかわからないが、
-`then関数`の引数を一定のものにしておいて、
-`resolve関数側で振り返ることができる。
-
-```js
-let num = 0
-let str = "hello"
-console.log(`first time: ${ num }`)
-
-new Promise((resolve, reject) => {
-  setTimeout(() => {
-    num = 1
-    str = "good-bye"
-    resolve(str)
-  }, 2000)
-}).then((result) => {
-  console.log(`second time: ${ result } <- 非同期のnum`)
-})
-
-console.log(`third time: ${ num } <- 最初のnum`)
-```
-
-### 4. reject
-
-`reject()`関数を発火させると`catch()関数`が実行される。
-なんらかのエラーが発生した時に使うもの。`resolve()`関数と同時では使えない。
-
-```js
-let num = 0
-let str = "hello"
-console.log(`first time: ${ num }`)
-
-new Promise((resolve, reject) => {
-  setTimeout(() => {
-    num = 1
-    reject()
-    // resolve()
-  }, 2000)
-}).then(() => {
-  console.log(`second time: ${ num } <- 非同期のnum`)
-}).catch(() => {
-  console.log(`reject: ${ num }`)
-})
-
-console.log(`third time: ${ num } <- 最初のnum`)
-```
-
-### 5. then()関数の数珠繋ぎ
-
-then()関数は処理を処理を繋げることが出来る。その際には変数を返すことを忘れずに。
-
-```js
-let num = 0
-let str = "hello"
-console.log(`first time: ${ num }`)
-
-new Promise((resolve, reject) => {
-  setTimeout(() => {
-    num = 1
-    resolve(num)
-    // reject()
-  }, 2000)
-
-}).then((num) => {
-  console.log(`second time: ${ num } <- 非同期のnum`)
-  return num;
-}).then((num) => {
-  console.log(`second time: ${ num } <- 非同期のnum`)
-  return num;
-}).then((num) => {
-  console.log(`second time: ${ num } <- 非同期のnum`)
-}).catch(() => {
-  console.log(`reject: ${ num }`)
-})
-
-console.log(`third time: ${ num } <- 最初のnum`)
-```
 
 ## 非同期処理（await, async）
 
 awaitキーワード then()関数の数珠繋ぎを簡略化する書き方
 
-1. __変数aを0で初期化。`init()`関数で、非同期処理をするための`Primise`は使われているが、`then()`関数がないので素通りして`consolo.log()`が出力される。__
+- then()関数部を削除。
+- 非同期処理があるPromiseのインスタンスを関数で囲まないといけな。
+- その関数の先頭に`async`キーワードを付与しておく。約束事。
+- Promiseを生成する箇所の前に`await`キーワードを付与しておく。約束事。
 
 ```js
-let a = 0;
-
-init() // => 0
-function init() {
-  new Promise((resolve) => {
-    setTimeout(() => {
-        a = 1;
-        resolve(a)
-    }, 2000);
-  })
-  console.log(a);
-}
-```
-
-2. __非同期処理の定義の前に`await`、それを定義する関数の前に`async`とそれぞれキーワードを付与する。__
-
-その1
-非同期処理で`resolve(a)`と引数を設定、出力`console.log(a)`で同じ引数を使う。
-```js
-let a = 0;
-
-init() // => 0
-async function init() {
-  await new Promise((resolve) => {
-    setTimeout(() => {
-        a = 1;
-        resolve(a)
-    }, 2000);
-  })
-  console.log(a);
-}
-```
-
-その2
-非同期処理でPromiseを変数に代入。その変数名を出力。本番はこちらのよう。
-```js
-let a = 0;
-
-init()
-async function init() {
-  const result = await new Promise((resolve) => {
-    setTimeout(() => {
-        a = 1;
-        resolve(a)
-    }, 2000);
-  })
-  console.log(result);
-}
-```
-
-3. __例外処理__
-
-意味が不明。これでは意味がない。
-
-```js
-let a = 0;
-
-init()
-async function init() {
-  // 例外処理を書く
-  // tryにエラーが発生するとした処理を書く。
-  // 意味がわからん。
-  try {
-    const result = await new Promise((resolve, reject) => {
+const Example = () => {
+  let num = 0
+  // console.log(num)
+  init()
+  async function init() {
+    await new Promise((resolve, reject) => {
       setTimeout(() => {
-          a = 1;
-          // resolve(a)
-          reject(a)
-      }, 2000);
+        num = 1
+        resolve(num)
+      }, 2000)
     })
-    console.log(result);
-  } catch(e) {
-    console.log('catchが実行', e)
+    console.log(num)
   }
+  return <></>  
 }
+export default Example;
+```
+
+エラー処理を書く。
+
+- 生成した`Promise`インスタンスは変数に格納して、出力はその変数名で書くことができる。
+- その出力部を`try { 出力部 } catch(e) { エラーだった時の処理 }`の形に入れ込む。
+- 普通はいきなりこの書き方から始まるので頭を整理しておくこと。
+
+```js
+const Example = () => {
+  let num = 0
+  console.log(num)
+  init()
+  async function init() {
+    try {
+      const result  = await new Promise((resolve, reject) => {
+        setTimeout(() => {
+          num = 1
+          resolve(num)
+        }, 2000)
+      })
+      console.log(result)
+    } catch(e) {
+      console.log('errorが発生', e)
+    }
+  }
+  console.log(num)
+  return <></>  
+}
+export default Example;
 ```
 
 # run React
