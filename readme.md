@@ -1924,7 +1924,7 @@ JSXはJSのオブジェクトとして扱われる。
 - 変数に代入できる。
 - 他のコンポーネントのpropsとして渡すことができる。
 
-# イベントリスナーとステート（状態管理）
+# イベントリスナーとState（状態管理）
 
 ## イベントに合わせて関数を実行する
 
@@ -2024,7 +2024,7 @@ const Example = () => {
 export default Example
 ```
 
-## ステート（状態管理）
+## State（状態管理）
 
 ### その　1
 こんな風に考えるがこれではダメ。
@@ -2144,7 +2144,7 @@ const Example = () => {
 export default Example
 ```
 
-## 複数のステートに対応・ステートは最上位
+## 複数のStateに対応・Stateは最上位
 
 ```js
 import { useState } from "react"
@@ -2193,5 +2193,474 @@ const Example = () => {
   )  
 };
 export default Example;
+```
 
+## 配列のState
+
+表示する部分を作成すると言われたらすぐに思い浮かべよう。
+変数をJSXで展開する記号にピンとくること。
+
+```js
+return (
+  <>
+    <p>現在のカウント数: {}</p>
+  </>
+)
+```
+
+Stateの変数を作成すると言われたらすぐに思い浮かべよう。
+importを連動して出てくるように。
+
+`const [count, setCount] = useStete(0)`
+
+イベントハンドラ`onClick`に任意の関数（名）`countUp`を仕込む。
+
+```js
+    <>
+      <p>現在のカウント数: { count }</p>
+      <button onClick={ countUp }"></button>
+    </>
+```
+
+関数を定義する
+
+```js
+const countUp = () => {
+  setCount(count + 1)
+}
+```
+
+完成コード
+
+```js
+import { useState } from "react";
+
+const Example = () => {
+  // Stateの変数を作成すると言われたらすぐに思い浮かべよう。
+  const [count, setCount] = useState(0)
+  const countUp = () => {
+    setCount(count + 1)
+  }
+  const countDown = () => {
+    setCount(count - 1)
+  }
+  return (
+    <>
+      <p>現在のカウント数: { count }</p>
+      <button onClick={ countUp }>Button Up</button>
+      <button onClick={ countDown }>Button Down</button>
+    </>
+  )
+};
+
+export default Example;
+```
+
+詳細説明
+
+```js
+const Example = () => {
+  // Stateの変数を作成すると言われたらすぐに思い浮かべよう。
+  const [count, setCount] = useState(0)
+  const countUp = () => {
+    // 変数`count`に値を保持しましたと言ってるだけ。
+    // `useState`を初期化して生成されたオブジェクトの関数部分の役目は、
+    // 1. 変数の状態を保持する。
+    // 2. Reactに対して現在の関数コンポーネント（この場合は`Example`）を再実行を依頼する。
+    // 3. その依頼は、将来に亘って予約（State）される。これを非同期で処理されるという。
+    // 4. 予約期限は、この関数コンポーネントが再レンダリングされる時に変数はセットされる。
+    setCount(count + 1)
+    // 敢えて変数の値を変更していく方法 任意の名称で`prevState`関数を定義する。
+    setCount(prevState => prevState + 100)
+    console.log(count)
+  }
+}
+```
+
+## オブジェクト型のStateを扱う際の注意
+
+JSには型がある。
+
+- プリミティブ型
+  - 数列
+  - 文字列
+  - 真偽値
+  - BigInt => 10nなど大きい数値を扱う型
+  - Symbol()
+  - null
+  - undefined
+- オブジェクト型
+  - プリミティブ型以外のもの、オブジェクト、配列など。
+
+### その　1
+
+- 現在の関数コンポーネント`Example`は、オブジェクトを持っている。
+- そのオブジェクトを変更可能にするために状態を保持する。
+- オブジェクトの値をJSXで表現する。
+
+```js
+import { useState } from "react";
+
+const Example = () => {
+  const personObj = { name: "Tom", age: 18 };
+  const [person, sttPerson] = useState(personObj)
+  return (
+    <>
+      <h3>Name: { person.name }</h3>
+      <h3>Age: { person.age }</h3>
+    </>
+  )
+};
+export default Example;
+```
+
+### その　2
+
+- JSXへinput要素を追加して入力したら表示も変更に追従できるようにする。
+- sttPersonで更新する内容の記述は、設定しているオブジェクトの構造と形を合わせることが肝要。
+- HTMLの話になるが、インプットの初期値設定は`value`属性。値は`useState`した変数から取れる。
+```js
+const Example = () => {
+  const personObj = { name: "Tom", age: 18 }
+  const [person, sttPerson] = useState(personObj)
+  const changeName = (e) => {
+    sttPerson({ name: e.target.value, age: person.age })
+  }
+  const changeAge = (e) => {
+    sttPerson({ name: person.name, age: e.target.value })
+  }
+  return (
+    <>
+      <h3>Name: { person.name }</h3>
+      <h3>Age: { person.age }</h3>
+      <input type="text" value={ person.name } onChange={ changeName } />
+      <input type="number" value={ person.age } onChange={ changeAge } />
+    </>
+  )
+}
+```
+
+## その 3
+
+- 値をリセットするボタンを追加する。
+
+```js
+const Example = () => {
+  const personObj = { name: "Tom", age: 18 }
+  const [person, sttPerson] = useState(personObj)
+  const changeName = (e) => {
+    sttPerson({ name: e.target.value, age: person.age })
+  }
+  const changeAge = (e) => {
+    sttPerson({ name: person.name, age: e.target.value })
+  }
+  const reset = () => {
+    sttPerson({ name: "", age: "" })
+  }
+  return (
+    <>
+      <h3>Name: { person.name }</h3>
+      <h3>Age: { person.age }</h3>
+      <input type="text" value={ person.name } onChange={ changeName } />
+      <input type="number" value={ person.age } onChange={ changeAge } />
+      <div>
+        <button onClick={ reset }>reset</button>
+      </div>
+    </>
+  )
+}
+```
+
+## その 4 `sttPerson`をリファクタリングする
+
+```js
+const personObj = { name: "Tom", age: 18 }
+const [person, sttPerson] = useState(personObj)
+const changeName = (e) => {
+  // `useState`で得た変数をスプレッド演算子にかけて
+  // オブジェクトで初期化すると別名でオブジェクトが生成される。
+  // console.log({ ...person }) => {name: 'Tom', age: 18}
+
+  // 比較演算子にかけて状態を確認する。
+  // console.log({ ...person } === person) => false
+
+  // その性質を使って、input要素へ送る値を生成するコードを整理してみる。
+  // sttPerson({ name: e.target.value, age: person.age })
+
+  // `sttPerson`の引数に、元の`person`の別名を`{ ...person }`を持ってきて、
+  // `name`は入力値に置き換えるために第二引数へ充てる。
+  // 何をやっているか一目瞭然だし、シンプル！ すごいRect。
+  sttPerson({ ...person, name: e.target.value })
+}
+const changeAge = (e) => {
+  sttPerson({ ...person, age: e.target.value })
+}
+```
+
+## その 5 ちょっとだけ捻った練習問題
+
+__問題__
+
+### 練習問題
+
+記述を変更し、完成コードのように「+と-ボタンをクリックするとCountの表示が1ずつ増減する機能」と「input要素に連動してItemの表示が変更される機能」を実装してください。コンポーネントの外側（上部）に変数や関数を準備しているためうまく使ってください。
+
+```js
+import { useState } from 'react';
+
+const Example = () => {
+  const orderObj = { item: 'apple', count: 10 };
+  const [order, setOrder] = useState(orderObj);
+  const changeItem = (e) => {};
+  const countUp = () => {};
+  const countDown = () => {};
+  return (
+    <div>
+      <h3>Item:{/* ここにorder.itemを表示してください。*/}</h3>
+      <h3>Count:{/* ここにorder.countを表示してください。*/}</h3>
+      <input type="text" value={order.item} onChange={changeItem} />
+      <button onClick={countUp}>+</button>
+      <button onClick={countDown}>-</button>
+    </div>
+  );
+};
+
+export default Example;
+
+```
+
+__答え__
+
+```js
+import { useState } from 'react';
+const Example = () => {
+  const orderObj = { item: 'apple', count: 10 };
+  const [order, setOrder] = useState(orderObj);
+  const changeItem = (e) => {
+    setOrder(order => ({ ...order, item: e.target.value }))
+  };
+  const countUp = () => {
+    setOrder(order => ({ ...order, count: order.count + 1 }))
+  };
+  const countDown = () => {
+    setOrder(order => ({ ...order, count: order.count - 1 }))
+  };
+  return (
+    <div>
+      <h3>Item:{ order.item }</h3>
+      <h3>Count:{ order.count }</h3>
+      <input type="text" value={order.item} onChange={changeItem} />
+      <button onClick={countUp}>+</button>
+      <button onClick={countDown}>-</button>
+    </div>
+  );
+};
+export default Example;
+```
+
+## 配列のStateを使う際の注意点
+
+配列の要素を書き換える場合は、別名で生成させて操作する。
+
+配列をStateする。
+
+```js
+import { useState } from "react"
+const Example = () => {
+  const numArray = [1, 2, 3, 4, 5];
+  const [asSaveArr, sttAsSaveArr] = useState(numArray)
+
+  return (
+    <>
+      <h3>{ asSaveArr }</h3>
+    </>
+  );
+};
+export default Example;
+```
+
+shuffleボタンをJSXに配置する。
+
+```js
+return (
+  <>
+    <h3>{ asSaveArr }</h3>
+    <button onClick={ clickBtn }>Shuffle</button>
+  </>
+);
+```
+
+shuffleボタンを実装する。
+
+```js
+import { useState } from "react"
+const Example = () => {
+  const numArray = [1, 2, 3, 4, 5];
+  const [asSaveArr, sttAsSaveArr] = useState(numArray)
+  // ボタンをクリックして渡ってきた`clickBtn`関数に動きをつける。
+  const clickBtn = () => {
+    // Stateした配列を別名保存する。
+    const newAsSaveArr = [...asSaveArr]
+    // 配列の最後の値を変数に格納。
+    const popedValue = newAsSaveArr.pop()
+    // 値を配列の前に差し込む。
+    newAsSaveArr.unshift(popedValue)
+    // Stateに返す、または引数にして代入する。これだけです。
+    sttAsSaveArr(newAsSaveArr)
+  }
+  return (
+    <>
+      <h3>{ asSaveArr }</h3>
+      <button onClick={ clickBtn }>Shuffle</button>
+    </>
+  );
+};
+export default Example;
+```
+
+## StateとComponentの関係
+
+StateはComponentと1：1で結びついている。
+
+### 練習問題
+
+- Exampleコンポーネントの中身をCountコンポーネントとして自身の中に複数レイアウトする。
+- 作成したコンポーネントはそれぞれに独立したStateを保持していることを確認する。
+
+__問題__
+
+```js
+import { useState } from "react"
+const Example = () => {
+  const [count, setCount] = useState(0)
+  const countUp = () => {
+    setCount(count + 1)
+    // setCount((prevstate) => prevstate + 1)
+  }
+  const countDown = () => {
+    setCount(count - 1)
+  }
+  return (
+    <>
+      <h3>カウント: {count}</h3>
+      <button onClick={countUp}>+</button>
+      <button onClick={countDown}>-</button>
+    </>
+  )
+}
+export default Example
+```
+
+__回答__
+
+```js
+import { useState } from "react"
+
+const Example = () => {
+  return (
+    <>
+      <Count />
+      <Count />
+    </>
+  )
+}
+
+const Count = () => {
+  const [count, setCount] = useState(0)
+  const countUp = () => {
+    setCount(count + 1)
+    // setCount((prevstate) => prevstate + 1)
+  }
+  const countDown = () => {
+    setCount(count - 1)
+  }
+  return (
+    <>
+      <h3>カウント: {count}</h3>
+      <button onClick={countUp}>+</button>
+      <button onClick={countDown}>-</button>
+    </>
+  )
+}
+export default Example
+```
+
+## 練習問題
+
+- タイトルのprops（ReactのJSX属性）を付与して冗長的にしてみる。
+- propsは親コンポーネントで定義して、子コンポーネントへ渡す。
+- 最終は子コンポーネントのJSX内要素への属性として適用させることが目的。子コンポーネントのJSX内要素をコントロールするためのもの。
+
+```js
+const Example = () => {
+  return (
+    <>
+      {/* JSX内、つまり文章構造の中で、props（属性）を付与する。 */}
+      <Count title="A"/>
+      <Count title="B"/>
+    </>
+  )
+}
+
+// 親から渡ってきたものを受け取る。props（属性）名を引数に入れる。
+const Count = ({ title }) => {
+  const [count, setCount] = useState(0)
+  const countUp = () => {
+    setCount(count + 1)
+    // setCount((prevstate) => prevstate + 1)
+  }
+  const countDown = () => {
+    setCount(count - 1)
+  }
+  return (
+    <>
+      {/* 親から渡ってきたpropsを子コンポーネントのJSXの要素へ引き渡す。 */}
+      <h3>{ title }カウント: {count}</h3>
+      <button onClick={countUp}>+</button>
+      <button onClick={countDown}>-</button>
+    </>
+  )
+}
+```
+
+- component A, Bを同じ場所で切り替えて出力してみる。
+- toggleボタンを追加してやる。
+
+```js
+import { useState } from "react"
+
+const Example = () => {
+  // A, Bどちらを表示するのかを示すflagを初期値`true`で作成する。
+  const [toggle, stateToggle] = useState(false)
+  const toggleComponent = () => {
+    // この仮引数に入っているのは`toggle`、つまり`true`か`false`
+    // 真だったら偽　偽だったら真　を返す無名関数。心臓部。
+    // つまり、stateToggleの状態をここで切替えることができる。
+    stateToggle(present => !present)
+  }
+  return (
+    <>
+      {/* `toggle`が`true`か`false`でCompoentを切替えるきっかけを与えるボタンを作成する。
+      ここのロジック大切。 */}
+      <button onClick={ toggleComponent }>切り替え</button>
+      {/* `toggle`が`true`か`false`で切り替える。 */}
+      { toggle ? <Count title="A"/> : <Count title="B"/>}
+    </>
+  )
+}
+...
+...
+export default Example
+```
+
+- ただし、この状態では、Aの状態で値を変更した場合値を保持してBに引き継がれてしまう。
+- 同じ階層のコンポーネントは状態を保持するのがReactの仕様。
+- 解決法はコンポーネントに`key`をつけて、切替えるたびにStateを初期化する。
+- ただし、値を保持できないのよね。。。
+
+```js
+<>
+  <button onClick={ toggleComponent }>切り替え</button>
+  { toggle ? <Count title="A" key="A" /> : <Count title="B" key="B" />}
+</>
 ```
