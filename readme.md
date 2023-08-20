@@ -2664,3 +2664,157 @@ export default Example
   { toggle ? <Count title="A" key="A" /> : <Count title="B" key="B" />}
 </>
 ```
+
+__一旦完成__
+
+```js
+import { useState } from "react";
+
+// POINT stateとコンポーネントの関係
+const Example = () => {
+  const [ toggle, setToggle ] = useState(true);
+  const toggleComponent = () => {
+    setToggle(prev => !prev);
+  }
+  return (
+    <>
+    {/* POINT コンポーネントの位置によってstateが識別される */}
+    <button onClick={toggleComponent}>toggle</button>
+    {toggle ? <Count key="A" title="A"/> : <Count key="B" title="B"/>}
+    {/* <Count title="A"/>
+    {toggle && <Count title="B"/>} */}
+    </>
+  )
+}
+const Count = ({ title }) => {
+  const [count, setCount] = useState(0);
+  const countUp = () => {
+    setCount((prevstate) => prevstate + 1);
+  };
+  const countDown = () => {
+    setCount(count - 1);
+  };
+  return (
+    <>
+      <h3>{title}: {count}</h3>
+      <button onClick={countUp}>+</button>
+      <button onClick={countDown}>-</button>
+    </>
+  );
+};
+
+export default Example;
+```
+
+## 値を保持できない問題を解決する
+
+コンポーネントが消滅した後も値を保持する方法
+
+- Stateの値、つまりカウントした数はCountコンポーネントで作成している。これを親コンポーネントへ移動する。
+Stateの値を差し込んでいるCountコンポーネントへporpsとして追記する。
+- 移動したStateをCountコンポーネントでpropsとして受信する。
+- 動作確認のためtoggleを削除する。
+- Count A, Bともクリックすると値が同時に同じ値で変わることを確認。参照しているStateが同じだから。
+
+```js
+import { useState } from "react";
+
+// POINT stateとコンポーネントの関係
+const Example = () => {
+  const [toggle, stateToggle] = useState(true);
+  const [count, stateCount] = useState(0);
+  const toggleComponent = () => {
+    stateToggle(prev => !prev);
+  }
+  return (
+    <>
+    {/* POINT コンポーネントの位置によってstateが識別される */}
+    <button onClick={ toggleComponent }>toggle</button>
+    <Count title="A" key="A" count={ count } setCount={ stateCount } />
+    <Count title="B" key="B" count={ count } setCount={ stateCount } />
+    </>
+  )
+  // return (
+  //   <>
+  //   {/* POINT コンポーネントの位置によってstateが識別される */}
+  //   <button onClick={ toggleComponent }>toggle</button>
+  //   { toggle 
+  //     ? <Count title="A" key="A" count={ count } setCount={ stateCount } /> 
+  //     : <Count title="B" key="B" count={ count } setCount={ stateCount } /> }
+  //   </>
+  // )
+}
+const Count = ({ title, count, setCount }) => {
+  const countUp = () => {
+    setCount((prevstate) => prevstate + 1);
+  };
+  const countDown = () => {
+    setCount(count - 1);
+  };
+  return (
+    <>
+      <h3>{title}: { count }</h3>
+      <button onClick={ countUp }>+</button>
+      <button onClick={ countDown }>-</button>
+    </>
+  );
+};
+export default Example;
+```
+
+- StateをA, Bで作成する。
+
+```js
+const [countA, stateCountA] = useState(0);
+const [countB, stateCountB] = useState(0);
+```
+
+- あとはtoggleで条件分岐させればいい。
+
+```js
+    { toggle
+      ? <Count title="A" key="A" count={ countA } setCount={ stateCountA } />
+      : <Count title="B" key="B" count={ countB } setCount={ stateCountB } />
+    }
+    </>
+```
+
+__完成コード__
+
+```js
+import { useState } from "react";
+
+const Example = () => {
+  const [toggle, stateToggle] = useState(true);
+  const [countA, stateCountA] = useState(0);
+  const [countB, stateCountB] = useState(0);
+  const toggleComponent = () => {
+    stateToggle(prev => !prev);
+  }
+  return (
+    <>
+    <button onClick={ toggleComponent }>toggle</button>
+    { toggle
+      ? <Count title="A" key="A" count={ countA } setCount={ stateCountA } />
+      : <Count title="B" key="B" count={ countB } setCount={ stateCountB } />
+    }
+    </>
+  )
+}
+const Count = ({ title, count, setCount }) => {
+  const countUp = () => {
+    setCount((prevstate) => prevstate + 1);
+  };
+  const countDown = () => {
+    setCount(count - 1);
+  };
+  return (
+    <>
+      <h3>{title}: { count }</h3>
+      <button onClick={ countUp }>+</button>
+      <button onClick={ countDown }>-</button>
+    </>
+  );
+};
+export default Example;
+```
