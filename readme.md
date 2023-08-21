@@ -3085,3 +3085,142 @@ const Profile = ({ name, age, hobbies }) => {
 };
 export default Profile;
 ```
+
+## 練習問題
+
+検索の仕組みをパターンを変えて考える。
+配列、オブジェクトを表示する仕組みを暗記。
+
+```js
+import Profile from "./components/Profile";
+import { useState } from "react"
+
+const persons = [
+  {
+    name: "Geo",
+    age: 18,
+    hobbies: ["sports", "music"],
+  },
+  {
+    name: "Tom",
+    age: 25,
+    hobbies: ["movie", "music"],
+  },
+  {
+    name: "Lisa",
+    age: 21,
+    hobbies: ["sports", "travel", "game"],
+  },
+];
+
+const Example = () => {
+  const [filterVal, stateFilterVal] = useState("")
+  return (
+    <>
+      <input type="text" value={ filterVal }
+        onChange={(e) => {
+          stateFilterVal(e.target.value)
+        }
+      } />
+      <ul>
+        { persons
+          .filter(person => {
+            return person.name.indexOf(filterVal) !== -1
+            {/* const isMatch = person.name.indexOf(filterVal) !== -1 */}
+            {/* return isMatch */}
+          })
+          .map(person => (
+            <li key={ person.name }>
+              <Profile { ...person } />
+            </li>
+          )) 
+        }
+      </ul>
+    </>
+  );
+};
+export default Example;
+```
+
+## if
+
+リスト項目の特定のアイテムに星印をつける。
+配列から渡ってくる項目に対して条件があったものに特定の処理をする寸法。
+
+丸括弧で囲んでいる意味
+戻り値はオブジェクト。
+オブジェクトを戻り値にする場合は、丸括弧で囲むことで意図を明示している。
+
+```js
+.map((animal) => (<li key={ animal }>{ animal }</li>))
+```
+
+ただし、今回は、if文を書くので普通に`{}`で囲む。
+
+```js
+import { useState } from "react";
+
+const Example = () => {
+  const animals = ["Dog", "Cat", "Rat"];
+  const [filterVal, setFilterVal] = useState("");
+
+  return (
+    <>
+      <input
+        type="text"
+        value={ filterVal }
+        onChange={ (e) => setFilterVal(e.target.value) }
+      />
+      <ul>
+        {animals
+          .filter((animal) => {
+            const isMatch = animal.indexOf(filterVal) !== -1;
+            return isMatch;
+          })
+          .map((animal) => {
+            if (animal === "Dog") {
+              return <li key={ animal }>{ animal }★</li>
+            } else {
+              return <li key={ animal }>{ animal }</li>
+            }
+          })
+        }
+      </ul>
+    </>
+  );
+};
+export default Example;
+```
+
+三項演算子にする。
+
+その1
+
+```js
+return (
+  <li key={ animal }>
+    { animal === "Dog" ? animal + "★" : animal }
+  </li>
+)
+```
+
+その2
+
+```js
+return (
+  <li key={ animal }>
+    { animal + (animal === "Dog" ? "★" : "") }
+  </li>
+)
+```
+
+`??`で書き換える。
+`A ?? B`
+`A`の値が、『`null`』『`undifine`』の場合に`B`を取る演算子
+
+よくあるやつ、データに`null`が入っている場合の対処法になる。
+`indexOf`は文字列型、配列型のメソッド。nullを扱えない。
+
+```js
+
+```

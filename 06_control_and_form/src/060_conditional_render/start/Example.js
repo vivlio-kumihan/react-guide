@@ -1,27 +1,32 @@
 import { useState } from "react";
 
 const Example = () => {
-  const animals = ["Dog", "Cat", "Rat"];
-
+  const animals = ["Dog", "Cat", null ,"Rat"];
   const [filterVal, setFilterVal] = useState("");
 
   return (
     <>
       <input
         type="text"
-        value={filterVal}
-        onChange={(e) => setFilterVal(e.target.value)}
+        value={ filterVal }
+        onChange={ (e) => setFilterVal(e.target.value) }
       />
       <ul>
         {animals
           .filter((animal) => {
-            const isMatch = animal.indexOf(filterVal) !== -1;
-            console.log(animal.indexOf(filterVal));
+            const animalStr = animal ?? ""
+            const isMatch = animalStr.indexOf(filterVal) !== -1;
             return isMatch;
           })
-          .map((animal) => (
-            <li key={animal}>{animal}</li>
-          ))}
+          .map((animal) => {
+            return (
+              <li key={ animal }>
+                { animal ?? "nullがあります。データをpwd修正してください。" }
+                { animal === "Dog" && "★" }
+              </li>
+            )
+          })
+        }
       </ul>
     </>
   );

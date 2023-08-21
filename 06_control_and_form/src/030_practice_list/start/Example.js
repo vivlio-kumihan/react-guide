@@ -1,5 +1,8 @@
-import Profile from "./components/Profile";
-import WhatEver from "./components/WhatEver";
+import Profile from "./components/Profile"
+import  Button  from "./components/Button"
+import { List } from "./components/List"
+
+import "./Example.css"
 
 const Example = () => {
   const persons = [
@@ -18,9 +21,12 @@ const Example = () => {
       age: 21,
       hobbies: ["sports", "travel", "game"],
     },
-  ];
+  ]
   return (
     <>
+      <h1 className="title">hello, hello, hello</h1>
+      <List />
+      <Button className="toggle-btn" />
       <ul>
       { persons.map((person) => (
         <li key={ person.name }>
@@ -28,7 +34,6 @@ const Example = () => {
         </li>
       )) }
       </ul>
-      <WhatEver />
     </>
   );
 };
