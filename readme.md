@@ -2672,7 +2672,7 @@ import { useState } from "react";
 
 // POINT stateとコンポーネントの関係
 const Example = () => {
-  const [ toggle, setToggle ] = useState(true);
+  const [toggle, setToggle] = useState(true);
   const toggleComponent = () => {
     setToggle(prev => !prev);
   }
@@ -2696,7 +2696,7 @@ const Count = ({ title }) => {
   };
   return (
     <>
-      <h3>{title}: {count}</h3>
+      <h3>{ title }: { count }</h3>
       <button onClick={countUp}>+</button>
       <button onClick={countDown}>-</button>
     </>
@@ -2817,4 +2817,271 @@ const Count = ({ title, count, setCount }) => {
   );
 };
 export default Example;
+```
+
+### 捻った練習問題
+
+- カウント結果とカウント実装部を分けてみる。
+- 親コンポーネントに子コンポーネントを継ぎ足ししてページを構成する。
+- 子コンポーネントに実現したい動きを想定した関数名を`props`として設定する。`属性={ 関数名 }`の形
+- 子コンポーネントで`props`を受信する。
+- 子コンポーネントのJSX内で開く。
+- 必要であれば動作を作る。
+
+```js
+import { useState } from "react"
+
+const Example = () => {
+  const [count, stateCount] = useState(0)
+  return (
+    <>
+    <CountResult title="カウント" counted={ count }/>
+    <CountUpdate  setCount={ stateCount }/> 
+    </>
+  );
+};
+
+const CountResult = ({ title, counted }) => {
+  return (
+    <>
+    <h3>{ title }: { counted }</h3>
+    </>
+  )
+}
+
+const CountUpdate = ({ setCount }) => {
+  const countUp = () => {
+    setCount(pervState => pervState + 1)
+  };
+  const countDown = () => {
+    setCount(pervState => pervState - 1)
+  };
+  return (
+    <>
+      <button onClick={ countUp }>+</button>
+      <button onClick={ countDown }>-</button>
+    </>
+  );
+};
+export default Example;
+```
+
+## 制御構文とフォームの制御
+
+### 配列をリスト表示する
+
+3つのやり方、ただし、使うのは`JSX内`で式として展開できる`map`だけ覚えればいいです。
+
+#### 配列の値をJSXで出力してみる
+
+```js
+const animals = ["Dog", "Cat", "Rat"]
+const Example = () => {
+  return (
+    <>
+      <h3>配列の操作</h3>
+      <ul>
+        <li>{ animals[0] }</li>
+        <li>{ animals[1] }</li>
+        <li>{ animals[2] }</li>
+      </ul>
+    </>
+  )
+}
+export default Example
+```
+
+#### 一般的なやり方にしてみる その1 for(ins of array)
+
+```js
+const animals = ["Dog", "Cat", "Rat"]
+const Example = () => {
+  let animalList = []
+  for(const animal of animals) {
+    animalList.push(<li>{ animal }</li>)
+  }
+  return (
+    <>
+      <h3>配列の操作</h3>
+      <ul>
+        { animalList }
+      </ul>
+    </>
+  )
+}
+export default Example
+```
+
+#### 一般的なやり方にしてみる その2 map
+
+```js
+const animals = ["Dog", "Cat", "Rat"]
+const Example = () => {
+  const animalList = animals.map(animal => <li>Hello, { animal }!</li>)
+  return (
+    <>
+      <h3>配列の操作</h3>
+      <ul>
+        { animalList }
+      </ul>
+    </>
+  )
+}
+export default Example
+```
+
+#### mapは式なのでJSX内に記述することができるのでコードを修正する。
+
+```js
+const animals = ["Dog", "Cat", "Rat"]
+const Example = () => {
+  return (
+    <>
+      <h3>配列の操作</h3>
+      <ul>
+        { animals.map(animal => <li>Hello, { animal }!</li>) }
+      </ul>
+    </>
+  )
+}
+export default Example
+```
+
+## リストには必ずkeyをつける
+
+配列のような繰り返し処理を行う子要素に対してはkey属性を付与する。
+key属性をつけないと要素を加減によって洗い替えが起きてシステムに負担が多くかかるから。
+
+- keyには必ず一意の値を設定する。ただし、子要素の中でキーは重複しなければ良い。他のコンポーネントとは監視範囲が違うから。
+- keyに設定した値は変更しない。
+　配列のインデックスはなるべくkeyに使用しない。
+
+## 配列のフィルターメソッドの使い方
+
+入力したらリストから値を取ってきて当てはまる文字列を表示する。どうすんねん！
+
+インプットされた値をStateするためにやることをやる。
+
+```js
+import { useState } from "react"
+
+const animals = ["Dog", "Cat", "Rat"]
+const Example = () => {
+  // Stateを初期化する。
+  const [filterVal, stateFilterVal] = useState("")
+  return (
+    <>
+      <h3>配列のフィルター</h3>
+      {/* input要素を作成しpropsを設定する。 */}
+      <input type="text" value={ filterVal }
+        onChange={ (e) => {
+            stateFilterVal(e.target.value)
+          }
+        }
+      />
+      <ul>
+        { animals.map(animal => <li>{animal}</li>) }
+      </ul>
+    </>
+  )
+}
+export default Example
+```
+
+- リストに検索装置を設置する。
+- filterの引数にコールバック関数を設定する。
+- 内容は、コールバック関数の戻り値が`true`の場合は新しい配列に含める。
+- `indexOf()`関数は、一致する文字が見つからなかった場合には`-1`を返す。
+- 否定の否定で`true`を返す。
+
+```js
+import { useState } from "react"
+
+const animals = ["Dog", "Cat", "Rat"]
+const Example = () => {
+  const [filterVal, stateFilterVal] = useState("")
+  return (
+    <>
+      <h3>配列のフィルター</h3>
+      <input type="text" value={ filterVal }
+        onChange={ (e) => {
+            stateFilterVal(e.target.value)
+          }
+        }
+      />
+      <ul>
+        { animals
+          .filter(animal => animal.indexOf(filterVal) !== -1)
+          .map(animal => <li key={ animal }>{ animal }</li>) 
+        }
+      </ul>
+    </>
+  )
+}
+export default Example
+```
+
+## 難しすぎる練習問題
+
+捻られると途端にわからなくなる。
+
+__Example.js__
+
+```js
+import Profile from "./components/Profile";
+
+const Example = () => {
+  const persons = [
+    {
+      name: "Geo",
+      age: 18,
+      hobbies: ["sports", "music"],
+    },
+    {
+      name: "Tom",
+      age: 25,
+      hobbies: ["movie", "music"],
+    },
+    {
+      name: "takahiro",
+      age: 21,
+      hobbies: ["sports", "travel", "game"],
+    },
+  ];
+  return (
+    <>
+      <ul>
+      { persons.map((person) => (
+        <li key={ person.name }>
+          <Profile { ...person } />
+        </li>
+      )) }
+      </ul>
+    </>
+  );
+};
+export default Example;
+```
+
+__Profile.js__
+
+```js
+const Profile = ({ name, age, hobbies }) => {
+  return (
+    <>
+      <hr />
+      <div>Name: { name }</div>
+      <div>Age: { age }</div>
+      <div>
+        <div>Hobby:</div>
+        <ul>
+          { hobbies.map((hobby) => (
+            <li key={ hobby }>{ hobby }</li>
+          )) }
+        </ul>
+      </div>
+    </>
+  );
+};
+export default Profile;
 ```
