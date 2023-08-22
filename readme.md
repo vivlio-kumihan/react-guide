@@ -3221,6 +3221,305 @@ return (
 よくあるやつ、データに`null`が入っている場合の対処法になる。
 `indexOf`は文字列型、配列型のメソッド。nullを扱えない。
 
-```js
+__まとめ__
 
+```js
+import { useState } from "react";
+
+const Example = () => {
+  const petArray = ["Dog", "Cat", null ,"Rat"];
+  const [filterVal, stateFilterVal] = useState("");
+
+  return (
+    <>
+      // input要素の慣用句だと思って覚える。
+      // valueにStateの変数。
+      // onChangeイベントにStateの関数。
+      <input
+        type="text"
+        value={ filterVal }
+        onChange={ (e) => stateFilterVal(e.target.value) }
+      />
+      <ul>
+        { petArray
+          .filter((pet) => {
+            const petStr = pet ?? ""
+            const isMatch = petStr.indexOf(filterVal) !== -1;
+            return isMatch;
+          })
+          .map((pet) => {
+            return (
+              <li key={ pet }>
+                { pet ?? "nullがあります。データをpwd修正してください。" }
+                { pet === "Dog" && "★" }
+              </li>
+            )
+          })
+        }
+      </ul>
+    </>
+  );
+};
+export default Example;
 ```
+
+## コンポーネントのリファクタリング
+
+__Example.js__
+
+```js
+import { useState } from "react";
+import AnimalList from "./components/AnimalList"
+
+const Example = () => {
+  const petArray = ["Dog", "Cat", null ,"Rat"]
+  const [filterVal, stateFilterVal] = useState("")
+  // 7. AnimalListコンポーネントから移築したフィルターを配置。
+  const FliteredAnimal = petArray.filter((pet) => {
+          const petStr = pet ?? ""
+          {/* 6. filterValが見つからないと言われる。 */}
+          const isMatch = petStr.indexOf(filterVal) !== -1;
+          return isMatch;
+        })
+  return (
+    <>
+      <input
+        type="text"
+        value={ filterVal }
+        onChange={ (e) => stateFilterVal(e.target.value) }
+      />
+      {/* 4. petArrayをpropsとして送信する。 */}
+      {/* <AnimalList animals={ petArray } /> */}
+      
+      <AnimalList petArray={ FliteredAnimal } />
+    </>
+  );
+};
+
+export default Example;
+```
+
+__AnimalList.js__
+
+```js
+// 2. AnimalListコンポーネントを作成する。
+// 5. propsのpetArrayを受信する。
+const AnimalList = ({ petArray }) => {
+  return (
+    // 1. Example親コンポーネントから持ってきたJSXを貼り付ける
+    <ul>
+      {/* 4. petArrayがないと言われるので、 */}
+      { petArray
+        // 7. AnimalListは単純に渡ってきた値をリストとして表示するだけの機能に限定するべき、
+        // フィルターを使って値を変更する機能は親コンポーネントに持たせる。
+        // なのでpetArrayにフィルターをかけている箇所をExpamleへ渡す。
+        // .filter((pet) => {
+        //   const petStr = pet ?? ""
+        //   // 6. filterValが見つからないと言われる。
+        //   const isMatch = petStr.indexOf(filterVal) !== -1;
+        //   return isMatch;
+        // })
+        .map((pet) => {
+          return (
+            <li key={ pet }>
+              { pet ?? "nullがあります。データをpwd修正してください。" }
+              { pet === "Dog" && "★" }
+            </li>
+          )
+        })
+      }
+    </ul>
+  )
+}
+// 3. 自信をexportする。
+export default AnimalList
+```
+
+
+
+## input
+
+input要素にはStateを連携させる
+
+Stateを宣言して、
+
+```js
+[val, setVal] = useState("");
+```
+
+入力のイベントを抽出し、
+
+```js
+onChange => setVal  => {(e) => setVal(e.target.value)}
+```
+
+変数に紐づける。
+
+```js
+value    => val     => {val}
+```
+
+```js
+const Example = () => {
+  const [val, setVal] = useState("");
+  const clearVal = () => setVal("");
+  return (
+    <div>
+      <label htmlFor="456">ラベル</label>
+      <div>
+        <input
+          id="123"
+          placeholder="こんにちは"
+          value={val}
+          onChange={(e) => setVal(e.target.value)}
+        />
+        ...
+  )
+}
+```
+
+## textarea
+
+設定は、`input`と同じ。
+
+HTML => `<textarea>`内容はここに入力される。`</textarea>`
+Reactでは、`value={val}`にあたる。
+React => `<textarea value={val} />`
+
+## クリア・ボタンの実装
+
+setVal関数に空文字を与えて関数にしておく。
+
+```js
+const [val, setVal] = useState("");
+const clearVal = () => setVal("");
+```
+
+それをボタンをクリックした時をきっかけに関数を実行させてクリアを行うという寸法。
+
+```js
+<button onClick={clearVal}>クリア</button>
+```
+
+```js
+const Example = () => {
+  const [val, setVal] = useState("");
+  const clearVal = () => setVal("");
+  return (
+    <div>
+      <label htmlFor="456">ラベル</label>
+      <div>
+        <input
+          id="123"
+          placeholder="こんにちは"
+          value={val}
+          onChange={(e) => setVal(e.target.value)}
+        />
+        <textarea　
+          id="456"
+          placeholder="こんにちは"
+          value={val}
+          onChange={(e) => setVal(e.target.value)}
+        />
+      </div>
+      <h3>{val}</h3>
+      <button onClick={clearVal}>クリア</button>
+    </div>
+  );
+};
+export default Example;
+```
+
+## raido botton
+
+- radioボタンが選択された時に取得したい値を設定する。
+- onChangeイベントハンドラが呼び出された時にあらかじめ設定しておいた関数を作動させる。
+- radioボタンのAppleをクリックする。
+- onChange関数が発動
+- setFruite関数にイベントの値が渡され、変数`fruite`に`Apple`が代入される。
+- checked属性で代入された`Apple`とStateが発動してから渡ってきたvalueを比較し、`true`だったらボタンにチェックが入るという寸法。
+周り回ってるわ！
+
+```js
+import { useState } from "react";
+// POINT ラジオボタンの実装
+const Example = () => {
+  const [fruit, setFruit] = useState("Apple");
+  const onChange = (e) => setFruit(e.target.value);
+
+  const RADIO_COLLECTION = ["Apple", "Banana", "Cherry"];
+
+  return (
+    <>
+      {RADIO_COLLECTION.map((value) => {
+        return (
+          <label key={value}>
+            <input
+              type="radio"
+              value={value}
+              checked={fruit === value}
+              onChange={onChange}
+            />
+            {value}
+          </label>
+        );
+      })}
+      {/* <label>
+        <input
+          type="radio"
+          value="Banana"
+          checked={fruit === "Banana"}
+          onChange={onChange}
+        />
+        Banana
+      </label>
+      <label>
+        <input
+          type="radio"
+          value="Cherry"
+          checked={fruit === "Cherry"}
+          onChange={onChange}
+        />
+        Cherry
+      </label> */}
+      <h3>私は{fruit}がたべたい</h3>
+    </>
+  );
+};
+export default Example;
+```
+
+## checkbox
+
+```js
+import { useState } from "react";
+// POINT チェックボックスの実装
+const Example = () => {
+  const [isChecked, setIsChecked] = useState(true);
+
+  // const toggleChecked = (e) => {
+  //   setIsChecked(prevState => !prevState);
+  // };
+
+  return (
+    <div>
+      <label htmlFor="my-check">
+        チェック：
+      </label>
+      <input
+        type="checkbox"
+        id="my-check"
+        checked={isChecked}
+        onChange={() => setIsChecked(prevState => !prevState)}
+      />
+      <div>{isChecked ? "ON!" : "OFF!"}</div>
+    </div>
+  );
+};
+export default Example;
+```
+
+
+`setFruit(e.target.value)`で渡ってきた値を`fruit`に代入し、
+valueが
+checked={fruit === value}

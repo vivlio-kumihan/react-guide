@@ -1,10 +1,14 @@
 import "./Child.css";
 
-const Child = () => {
+const Child = ({ color = "green" }) => {
   return (
-    <div className="component">
+    <>
+    {/* HTML => class="component red" */}
+    {/* 文字列の中で変数展開をするからこういう記号になる。 */}
+    <div className={`component ${ color }`}>
       <h3>Hello Component</h3>
     </div>
+    </>
   );
 };
 
