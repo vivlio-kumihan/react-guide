@@ -1,31 +1,23 @@
-// 2. AnimalListコンポーネントを作成する。
-// 5. propsのpetArrayを受信する。
+import ListItem from "./ListItem";
+
 const AnimalList = ({ petArray }) => {
+  // 10. エラー処理をしておく
+  // petArrayに値がない場合の処理を書く
+  if (petArray.length === 0) {
+    return <p>入力されたペットが見つかりません。</p>
+  }
   return (
-    // 1. Example親コンポーネントから持ってきたJSXを貼り付ける
     <ul>
-      {/* 4. petArrayがないと言われるので、 */}
       { petArray
-        // 7. AnimalListは単純に渡ってきた値をリストとして表示するだけの機能に限定するべき、
-        // フィルターを使って値を変更する機能は親コンポーネントに持たせる。
-        // なのでpetArrayにフィルターをかけている箇所をExpamleへ渡す。
-        // .filter((pet) => {
-        //   const petStr = pet ?? ""
-        //   // 6. filterValが見つからないと言われる。
-        //   const isMatch = petStr.indexOf(filterVal) !== -1;
-        //   return isMatch;
-        // })
         .map((pet) => {
           return (
-            <li key={ pet }>
-              { pet ?? "nullがあります。データをpwd修正してください。" }
-              { pet === "Dog" && "★" }
-            </li>
+            // 15. ListItemからkeyを移動する。
+            // <ListItem pet={ pet }/>
+            <ListItem pet={ pet } key={ pet }/>
           )
         })
       }
     </ul>
   )
 }
-// 3. 自信をexportする。
 export default AnimalList

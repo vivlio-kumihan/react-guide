@@ -3265,6 +3265,8 @@ export default Example;
 
 ## コンポーネントのリファクタリング
 
+### 1-7までの手順
+
 __Example.js__
 
 ```js
@@ -3331,11 +3333,186 @@ const AnimalList = ({ petArray }) => {
     </ul>
   )
 }
-// 3. 自信をexportする。
+// 3. 自身をexportする。
 export default AnimalList
 ```
 
+### 8からの手順
 
+__Example.js__
+
+```js
+import { useState } from "react";
+import AnimalList from "./components/AnimalList"
+
+const Example = () => {
+  const petArray = ["Dog", "Cat", null ,"Rat"]
+  const [filterVal, stateFilterVal] = useState("")
+  const FliteredAnimal = petArray.filter((pet) => {
+          const petStr = pet ?? ""
+          const isMatch = petStr.indexOf(filterVal) !== -1;
+          return isMatch;
+        })
+  return (
+    <>
+      <input
+        type="text"
+        value={ filterVal }
+        onChange={ (e) => stateFilterVal(e.target.value) }
+      />
+      <AnimalList petArray={ FliteredAnimal } />
+    </>
+  );
+};
+export default Example;
+```
+
+__AnimalList.js__
+
+```js
+import ListItem from "./ListItem";
+
+const AnimalList = ({ petArray }) => {
+  // 10. エラー処理をしておく
+  // petArrayに値がない場合の処理を書く
+  if (petArray.length === 0) {
+    return <p>入力されたペットが見つかりません。</p>
+  }
+  return (
+    <ul>
+      { petArray
+        .map((pet) => {
+          return (
+            // 8. リストのliをListItem.jsとしてコンポーネント化する。
+            // <li key={ pet }>
+            //   { pet ?? "nullがあります。データをpwd修正してください。" }
+            //   { pet === "Dog" && "★" }
+            // </li>
+            // 9. map関数の引数となっている`pet`を`propsl`として
+            // ListItemコンポーネントへ送信する。
+            <ListItem pet={ pet }/>
+          )
+        })
+      }
+    </ul>
+  )
+}
+export default AnimalList
+```
+
+__ListItem.js__
+
+```js
+// 8. ListItemとしてコンポーネントを作成する。
+const ListItem = ({ pet }) => {
+  return (
+    <li key={ pet }>
+      { pet ?? "nullがあります。データをpwd修正してください。" }
+      { pet === "Dog" && "★" }
+    </li>
+  )
+}
+export default ListItem
+```
+
+### 10からの手順
+
+__Example.js__
+
+```js
+import { useState } from "react";
+import AnimalList from "./components/AnimalList"
+import InputFilterVal from "./components/InputFilterVal"
+
+const Example = () => {
+  const petArray = ["Dog", "Cat", null ,"Rat"]
+  const [filterVal, stateFilterVal] = useState("")
+  const FliteredAnimal = petArray.filter((pet) => {
+          const petStr = pet ?? ""
+          const isMatch = petStr.indexOf(filterVal) !== -1;
+          return isMatch;
+        })
+  return (
+    <>
+      {/* 11. input要素もコンポーネント化する。 */}
+      {/* InputFilterValコンポーネントを作成してコードを移動する。 */}
+      {/* <input
+            type="text"
+            value={ filterVal }
+            onChange={ (e) => stateFilterVal(e.target.value) }
+          /> */}
+      <InputFilterVal filterState={ [filterVal, stateFilterVal] }/>
+      <AnimalList petArray={ FliteredAnimal } />
+    </>
+  );
+};
+export default Example;
+```
+
+__AnimalList.js__
+
+```js
+import ListItem from "./ListItem";
+
+const AnimalList = ({ petArray }) => {
+  // 10. エラー処理をしておく
+  // petArrayに値がない場合の処理を書く
+  if (petArray.length === 0) {
+    return <p>入力されたペットが見つかりません。</p>
+  }
+  return (
+    <ul>
+      { petArray
+        .map((pet) => {
+          return (
+            // 15. ListItemからkeyを移動する。
+            // <ListItem pet={ pet }/>
+            <ListItem pet={ pet } key={ pet }/>
+          )
+        })
+      }
+    </ul>
+  )
+}
+export default AnimalList
+```
+
+__ListItem.js__
+
+```js
+const ListItem = ({ pet }) => {
+  return (
+    // 15. 現状だとkeyがないと警告される。ここにあるのに。。。
+    // 親コンポーネントにつけないといけないルールだそう。
+    // 削除してAnimalListの該当部分へ配置する。
+    // <li key={ pet }>
+    <li>
+      { pet ?? "nullがあります。データをpwd修正してください。" }
+      { pet === "Dog" && "★" }
+    </li>
+  )
+}
+export default ListItem
+```
+
+__InputFilterVal.js__
+
+```js
+// 12. InputFilterValコンポーネントの作成。
+// 13. ExampleコンポーネントからStateをprops経由で受け取る。
+const InputFilterVal = ({ filterState }) => {
+  // 14. 受け取ったState（状態）が格納されているpropsを分割代入して展開する。
+  const [filterVal, stateFilterVal] = filterState
+  return (
+    <input
+      type="text"
+      value={ filterVal }
+      onChange={ (e) => stateFilterVal(e.target.value) }
+    />
+  )
+}
+export default InputFilterVal
+```
 
 ## input
 
