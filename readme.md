@@ -365,7 +365,7 @@ const fnObj = (objAddr) => {
 };
 fnObj(objAddress);
 ```
-
+# ここを見る
 __分割代入でやる。配列と同じ。__
 
 ```js
