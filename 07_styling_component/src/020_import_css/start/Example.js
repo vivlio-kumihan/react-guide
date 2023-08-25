@@ -3,12 +3,14 @@ import "./Example.css"
 
 const Example = () => {
   const [isSelected, setIsSelected] = useState(false);
+  // トグルスイッチの仕込み
   const clickHandler = () => setIsSelected((prev) => !prev);
 
   // クラスを追加したい。
   return (
     <>
-      <button className={ `btn ${ isSelected ? "selected" : "" }` } onClick={clickHandler}>
+                                {/* クラスの切り替え部 */}             {/* トグルスイッチ発火部 */}
+      <button className={ `btn ${ isSelected ? "selected" : "" }` } onClick={  clickHandler }>
         ボタン
       </button>
       <div style={{ textAlign: "center" }}>

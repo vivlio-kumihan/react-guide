@@ -3700,3 +3700,249 @@ export default Example;
 `setFruit(e.target.value)`で渡ってきた値を`fruit`に代入し、
 valueが
 checked={fruit === value}
+
+## Styling
+
+### inline style
+
+```js
+import { useState } from "react"
+
+const Example = () => {
+  const [isSelected, setIsSelected] = useState(false);
+  const clickHandler = () => setIsSelected(prev => !prev);
+  // インライン・スタイルはオブジェクトを変数に代入して指定する。
+  // JS内の記述なので扱いがCSSと違う。
+  // 値を文字列で区切ったり、数字だけ書いてpx省略、属性はキャメルケースとか。
+  // JSが書けるのがメリット。
+  // 疑似セレクタやメディアクエリにも対応していない。これは絶望的。常用で使うことはない。
+  const style = {
+    display: "block",
+    width: 200,
+    height: 50,
+    margin: "0 auto 20px",
+    fontWeight: "bold",
+    cursor: "pointer",
+    border: "none",
+    borderRadius: 9999,
+    backgroundColor: isSelected ? "pink" : ""
+  }
+  return (
+    <>
+      {/* toggle */}
+      <button onClick={ clickHandler } style={ style }>ボタン</button>
+      {/* 論理積: 真 && 真 => 右側の真 */}
+      {/* 上は変数で、こちらは直にインラインする。 */}
+      {/* JSX => style={} */} {/* その中の{}はオブジェクト */}
+      <div style={{ textAlign: "center" }}>{ isSelected && "クリックされました。" }</div>
+    </>
+  )
+};
+export default Example;
+```
+
+## 外部CSSのimportを使ったスタイリング
+
+サイト全体に関わるスタイリングに使う。
+コンポーネントのスタイリングには向いていない。
+
+```js
+import { useState } from "react";
+import "./Example.css"
+
+const Example = () => {
+  const [isSelected, setIsSelected] = useState(false);
+  // トグルスイッチの仕込み
+  const clickHandler = () => setIsSelected((prev) => !prev);
+
+  // クラスを追加したい。
+  return (
+    <>
+                                {/* クラスの切り替え部 */}             {/* トグルスイッチ発火部 */}
+      <button className={ `btn ${ isSelected ? "selected" : "" }` } onClick={  clickHandler }>
+        ボタン
+      </button>
+      <div style={{ textAlign: "center" }}>
+        { isSelected && "クリックされました。" }
+      </div>
+    </>
+  );
+};
+export default Example;
+```
+
+### CSS-in-JS
+
+CSS-in-JSをするためにはVSCodeの拡張機能必要。
+VSCodeの`styled-components.vscode-styled-components`で検索してインストール。
+
+```js
+console.dir(styled)
+```
+
+styledの内容を確認すると属性はCSSと同じだけ揃えてある。styledに設定したい属性名を充ててインスタンスを生成。
+そこへテンプレート・リテラルで囲んだCSSを記述していく。
+なお、React要素扱いなので変数名は大文字で記述する。
+
+```js
+import styled from "styled-components"
+
+const StyledButton = styled.button`
+  margin: auto;
+  border-radius: 9999px;
+  border: none;
+  display: block;
+  width: 120px;
+  height: 60px;
+  font-weight: bold;
+  cursor: pointer; 
+  background-color: ${ ({ isSelected }) => isSelected ? "pink" : "" };
+`
+```
+
+#### CSS-in-JSで書いた場合の利点満載コード
+
+```js
+import { useState } from "react";
+import styled from "styled-components"
+
+// styledの内容を確認すると属性はCSSと同じだけ揃えてある。
+// styledに設定したい属性名を充ててインスタンスを生成。
+// そこへテンプレート・リテラルで囲んだCSSを記述していく。
+// console.dir(styled)
+
+const StyledButton = styled.button`
+  margin: auto;
+  border-radius: 9999px;
+  border: none;
+  display: block;
+  width: 120px;
+  height: 60px;
+  font-weight: bold;
+  cursor: pointer; 
+  background-color: ${ ({ isSelected }) => isSelected ? "pink" : "" };
+`
+// クラスの継承
+// 上書きしたクラスを持ったコンポーネントを作成する。
+// styled()関数の引数には、オリジナルのコンポーネントを代入してインスタンスを作る。
+// 利点は、擬似要素、スタイルのインデントが使えること。
+
+const OrangeBgColorButton = styled(StyledButton)`
+  position: relative;
+  background-color: orange;
+  :hover {
+    color: red;
+    opacity: .7;
+  }
+  ::before {
+    position: absolute;
+    top: 0%;
+    left: 50%;
+    transform: translateX(-50%);
+    content: "hello";
+    font-size: 1em;
+    color: #fff;
+  }
+  span {
+    font-size: 1.5em;
+  }
+`
+
+const SecondButton = styled(StyledButton)`
+  color: #fff;
+  background-color: ${ ({ dark }) => dark ? "black" : ""};
+`
+
+const Example = () => {
+  const [isSelected, setIsSelected] = useState(false);
+  const clickHandler = () => setIsSelected((prev) => !prev);
+
+  return (
+    <>
+      {/* `isSelected`を`props`にする。デフォルトで入っているのは`false`。 */}
+      <StyledButton isSelected={ isSelected } onClick={ clickHandler }>Button</StyledButton>
+      <SecondButton dark="dark" isSelected={ isSelected } onClick={ clickHandler }>Button</SecondButton>
+      <OrangeBgColorButton isSelected={ isSelected } onClick={ clickHandler }><span>Button</span></OrangeBgColorButton>
+      <div style={{ textAlign: "center" }}>
+        {isSelected && "クリックされました。"}
+      </div>
+    </>
+  );
+};
+export default Example;
+```
+
+## DOM操作
+
+### createPortal
+
+__Example.js__
+
+```js
+import { useState } from "react";
+import { createPortal } from "react-dom";
+import Modal from "./components/Modal";
+// createPortalを使うと違う親へ要素を移動できる。
+/* POINT createPortalの使い方
+*/
+// createPortalで作成するのは、子要素を受け入れる容器であるインスタンスと移動先
+// 引数にchildrenを持つ無名関数を定義する。
+// 以上で、ModalPortalをコンポーネントのように使用できる。
+const ModalPortal = ({ children }) => {
+  const target = document.querySelector('.container.start');
+  // 第一引数: React の子要素としてレンダー可能なもの （要素、文字列、フラグメント、コンポーネントなど）
+  // 第一引数にレンダリングしたい子要素を引数にする。
+  // 第二引数にレンダー先のDOM要素
+  return createPortal(children, target)
+};
+/* POINT createPortalはどんなときに使うか？
+子要素は親要素のスタイルによって表示に制限を受ける場合があります。
+（overflow: hidden 、 z-index 、 width　など・・・ ）
+それらの制限なく、子要素が親要素を「飛び出して」表示する必要があるときにcreatePortalを使うのが有効です。
+モーダル、ポップアップ、トーストは使用の代表例です。
+*/
+const Example = () => {
+  const [modalOpen, setModalOpen] = useState(false);
+  return (
+    <div>
+      <div className="container start"></div>
+      <button
+        type="button"
+        onClick={ () => setModalOpen(true) }
+        disabled={ modalOpen }
+      >
+        モーダルを表示する
+      </button>
+      {/* modalOpen => defaultでfalse */}
+      {/* 容器にModalを包む。 */}
+      { modalOpen && (
+        <ModalPortal>
+          <Modal handleCloseClick={ () => setModalOpen(false) } /> 
+        </ModalPortal>
+      )}
+    </div>
+  );
+};
+export default Example;
+```
+
+__modal.js__
+
+```js
+import "./Modal.css";
+
+const Modal = ({ handleCloseClick }) => {
+  return (
+    <div className="modal">
+      <div className="modal__content">
+        <p>モーダル</p>
+        <button type="button" onClick={ handleCloseClick }>
+          閉じる
+        </button>
+      </div>
+    </div>
+  );
+};
+export default Modal;
+```
+

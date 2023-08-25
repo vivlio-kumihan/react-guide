@@ -1,6 +1,11 @@
 import { useState } from "react";
 import styled from "styled-components"
 
+// styledの内容を確認すると属性はCSSと同じだけ揃えてある。
+// styledに設定したい属性名を充ててインスタンスを生成。
+// そこへテンプレート・リテラルで囲んだCSSを記述していく。
+// console.dir(styled)
+
 const StyledButton = styled.button`
   margin: auto;
   border-radius: 9999px;
@@ -12,15 +17,11 @@ const StyledButton = styled.button`
   cursor: pointer; 
   background-color: ${ ({ isSelected }) => isSelected ? "pink" : "" };
 `
-const SecondButton = styled(StyledButton)`
-  color: #fff;
-  background-color: ${ ({ dark }) => dark ? "black" : ""};
-`
-
-// クラスの上書き
+// クラスの継承
 // 上書きしたクラスを持ったコンポーネントを作成する。
 // styled()関数の引数には、オリジナルのコンポーネントを代入してインスタンスを作る。
-// 擬似要素が使える。スタイルのインデントも使える。
+// 利点は、擬似要素、スタイルのインデントが使えること。
+
 const OrangeBgColorButton = styled(StyledButton)`
   position: relative;
   background-color: orange;
@@ -40,6 +41,11 @@ const OrangeBgColorButton = styled(StyledButton)`
   span {
     font-size: 1.5em;
   }
+`
+
+const SecondButton = styled(StyledButton)`
+  color: #fff;
+  background-color: ${ ({ dark }) => dark ? "black" : ""};
 `
 
 const Example = () => {
