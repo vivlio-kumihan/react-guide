@@ -3874,17 +3874,17 @@ export default Example;
 
 ## DOM操作
 
-### createPortal
+### createPortal モーダルを作ってみる
 
 __Example.js__
 
 ```js
 import { useState } from "react";
+// createPortalを使うと違う親へ要素を移動できる。
 import { createPortal } from "react-dom";
 import Modal from "./components/Modal";
-// createPortalを使うと違う親へ要素を移動できる。
-/* POINT createPortalの使い方
-*/
+
+// POINT createPortalの使い方
 // createPortalで作成するのは、子要素を受け入れる容器であるインスタンスと移動先
 // 引数にchildrenを持つ無名関数を定義する。
 // 以上で、ModalPortalをコンポーネントのように使用できる。
@@ -3945,4 +3945,582 @@ const Modal = ({ handleCloseClick }) => {
 };
 export default Modal;
 ```
+
+### Bubbling portalを使う際の注意点
+
+> Bubbling
+  イベントが子要素から親要素へ伝播していく仕組み。
+  例
+  子要素にクリック・イベントが発生 => 親要素へ伝播　親要素にイベント・ハンドラーがあればイベントが実行される。
+
+ボタンをクリックすると、親のクリックイベントも反応する。伝播した証拠。
+
+```js
+const Example = () => {
+  const [modalOpen, setModalOpen] = useState(false);
+  return (
+    <div onClick={() => console.log("親のdiv要素へ伝播した証拠")}>
+      <div onClick={() => console.log("新しい親のdiv要素へ伝播した証拠")}
+          className="container start"></div>
+      <button
+        type="button"
+        onClick={ () => setModalOpen(true) }
+        disabled={ modalOpen }
+      >
+        モーダルを表示する
+      </button>
+        { modalOpen && (
+          <ModalPortal>
+            <Modal handleCloseClick={ () => setModalOpen(false) } /> 
+          </ModalPortal>
+        )}
+    </div>
+  );
+};
+```
+
+React要素の構成に従ってBubblingする。
+JSによって構成要素を変更してもその新しい構成に準じてBubblingすることはしない。
+
+```js
+const Example = () => {
+  const [modalOpen, setModalOpen] = useState(false);
+  return (
+    <div onClick={() => console.log("親のdiv要素へ伝播した証拠")}>
+      <div onClick={() => console.log("新しい親のdiv要素へ伝播した証拠")}
+        className="container start">
+          // ここへbutton要素が入ってくるので、モーダル画面でのボタンを押したら反応すると想像しがちだがダメです。
+        </div>
+      <button
+        type="button"
+        onClick={ () => setModalOpen(true) }
+        disabled={ modalOpen }
+      >
+        モーダルを表示する
+      </button>
+        { modalOpen && (
+          <ModalPortal>
+            <Modal handleCloseClick={ () => setModalOpen(false) } /> 
+          </ModalPortal>
+        )}
+    </div>
+  );
+};
+```
+
+## useRef refでDOMを操作する
+
+基本的にはDOMは直接操作しない。　
+Reactで実装できない時にDOM操作でかわす感じか。
+ボタンをクリックすると関連する入力欄がfocusされる場合をやってみる。
+
+```js
+import { useState, useRef } from "react";
+
+const Case1 = () => {
+  // 1. 状態を生成させる。
+  const [value, setValue] = useState("");
+  const inputRef = useRef();
+  // => 戻り値はこれ、{current: undefined}
+  // つまり、値の更新を行うときは、current属性にDOMのメソッドを直接当てることになる。
+  console.log(inputRef) 
+  return (
+    <div>
+      <h3>ユースケース1</h3>
+      {/* 2. input要素にfocusを当てたいのでuseRef()関数から生成したインスタンスをここに属性として設定する。 */}
+      {/* イベントで発火させたインスタンスをrefで受信するイメージ。 */}
+      {/* JSXのinput要素の参照をinputRefが保持することになる。 */}
+      <input type="text" value={value} ref={inputRef} onChange={(e) => setValue(e.target.value)} />
+      {/* 3. 確認のため、onClickイベントで発火させてみる。 */}
+      {/* <button onClick={() => console.log(inputRef)}> */}
+      {/* 4. current属性でDOMのメソッドが直接使えることになる。 */}
+      <button onClick={() => inputRef.current.focus( )}>
+        インプット要素をフォーカスする
+      </button>
+    </div>
+  );
+};
+const Example = () => {
+  return (
+    <>
+      <Case1 />
+    </>
+  );
+};
+export default Example;
+```
+
+### 動画の再生をrefで扱ってみる。
+
+```js
+import { useState, useRef } from "react";
+
+const Case1 = () => {
+  const [value, setValue] = useState("");
+  const inputRef = useRef();
+  return (
+    <div>
+      <h3>ケース1</h3>
+      <input type="text" value={value} ref={inputRef} onChange={(e) => setValue(e.target.value)} />
+      <button onClick={() => inputRef.current.focus( )}>
+        インプット要素をフォーカスする
+      </button>
+    </div>     
+  );
+};
+
+const Case2 = () => {
+  // 2. video要素の状態を設置する。
+  // 最初の状態ではvideoは動いて『ない』のでfalseを設定する。
+  const [playing, statePlay] = useState(false);
+  // 5. video要素に状態を与える。
+  const videoRef = useRef();
+  return (
+    <div>
+      <h3>ケース2</h3>
+      {/* 1. video要素を設置し、 */}
+      {/* 5. イベントで発火された時に飛んでくるインスタンスの受信機を設置する。 */}
+      <video ref={videoRef} style={{ maxWidth: "100%" }}>
+        <source src="./sample.mp4" />
+      </video>
+      <button onClick={() => {
+        {/* 6. イベントで発火。状態を見て振り分け、インスタンスを送信する。 */}
+        if(playing) {
+          videoRef.current.pause();
+        } else {
+          videoRef.current.play();
+        }
+        {/* 3. toggleスイッチを設置する。いつものやつ。暗記する。 */}
+        statePlay(flag => !flag); 
+      }}>
+        {/* 4. ボタンの表記を変える。 */}
+        { playing ? 'Stop' : 'Play' }
+      </button>
+    </div>
+  )
+}
+
+const Example = () => {
+  return (
+    <>
+      <Case1 />
+      {/* コンポーネントとして読み込む */}
+      <Case2 />
+    </>
+  );
+};
+export default Example;
+```
+
+### useRef　refとは？　refとstateの違い
+
+- 再レンダリングが発生しても値が保持される。
+- refの値を更新しても再レンダリングがトリガーされない。　
+- refオブジェクトをJSXのref属性に渡すとそのDOMにアクセスできるようになる。
+
+```js
+const inputRef = useRef(null or undefinedの時は空で良い)
+```
+
+#### refの値を更新しても再レンダリングがトリガーされないを確認する。
+
+> POINT refを使うべきタイミング
+  Reactは一般的に、propsを通して親から子へ作用させる、というデータフローが原則です。
+  refを使ってコンポーネントに作用を起こすことは、その原則を崩す行為なので多用は避けましょう。
+
+refに適した使用例は以下の場合とされています。
+- フォームへのフォーカス、テキストの選択、メディア（動画・音声）の再生の管理
+- アニメーションの発火
+- サードパーティの DOM や、React管理外のDOMの埋め込み
+
+```js
+import { useState, useRef } from "react";
+
+const Case1 = () => {
+  const [value, setValue] = useState("");
+  const inputRef = useRef();
+  return (
+    <div>
+      <h3>ケース1</h3>
+      <input type="text" value={value} ref={inputRef} onChange={(e) => setValue(e.target.value)} />
+      <button onClick={() => inputRef.current.focus( )}>
+        インプット要素をフォーカスする
+      </button>
+    </div>     
+  );
+};
+// POINT 動画の再生・停止を制御
+
+const Case2 = () => {
+  const [playing, statePlay] = useState(false);
+  const videoRef = useRef();
+  return (
+    <div>
+      <h3>ケース2</h3>
+      <video ref={videoRef} style={{ maxWidth: "100%" }}>
+        <source src="./sample.mp4" />
+      </video>
+      <button onClick={() => {
+        if(playing) {
+          videoRef.current.pause();
+        } else {
+          videoRef.current.play();
+        }
+        statePlay(flag => !flag); 
+        }
+      }>
+        { playing ? 'Stop' : 'Play' }
+      </button>
+    </div>
+  )
+}
+/* POINT useRefは再レンダリングされません。
+書き換え可能な情報としてコンポーネントに保持させておくことができます。
+state は更新されるごとに再レンダーされますが、refオブジェクトの中身が変わっても再レンダーが走ることはありません。
+*/
+
+const createTimeStamp = () => new Date().toLocaleString();
+const Case3 = () => {
+  const [timeStamp, stateTimeStamp] = useState(createTimeStamp());
+  const ref = useRef(createTimeStamp());
+
+  const updateState = () => {
+    stateTimeStamp(createTimeStamp());
+  };
+
+  const updateRef = () => {
+    /* コンソールを見るとブラウザの表示と、ref.currentの中身が異なることを確認できます */
+
+    ref.current = createTimeStamp();
+    console.log('ref.current -> ', ref.current);
+  };
+
+  return (
+    <div>
+      <h3>ケース3</h3>
+      <p>
+        state: { timeStamp }
+        <button onClick={ updateState }>更新</button>
+      </p>
+      <p>
+        ref: { ref.current }
+        <button onClick={ updateRef }>更新</button>
+      </p>
+    </div>
+  )
+}
+
+/* POINT refを使うべきタイミング
+Reactは一般的に、propsを通して親から子へ作用させる、というデータフローが原則です。
+refを使ってコンポーネントに作用を起こすことは、その原則を崩す行為なので多用は避けましょう。
+
+refに適した使用例は以下の場合とされています。
+- フォームへのフォーカス、テキストの選択、メディア（動画・音声）の再生の管理
+- アニメーションの発火
+- サードパーティの DOM や、React管理外のDOMの埋め込み
+*/
+const Example = () => {
+  return (
+    <>
+      <Case1 />
+      {/* コンポーネントとして読み込む */}
+      <Case2 />
+      <Case3 />
+    </>
+  );
+};
+export default Example; 
+```
+
+## foward Ref
+　
+コンポーネントを跨いでrefをやりとりする方法について
+
+```js
+// その1
+import { useRef } from "react";
+
+const Example = () => {
+  const ref = useRef();
+  return (
+    <>
+      {/* input要素に対してref属性がついている。 */}
+      {/* 別のコンポーネントに切り出した（?）時にどのようにrefを受渡するのか？ */}
+      <input type="text" ref={ref} />
+      <button onClick={() => ref.current.focus()}>
+        インプット要素をフォーカスする
+      </button>
+    </>
+  );
+};
+export default Example;
+
+// その2
+import { useRef } from "react";
+
+// 1. コンポーネントを生成する。
+// refが定義されていないと怒られるので、
+const Input = () => {
+  return <input type="text" ref={ref} />
+}
+
+const Example = () => {
+  // 2. そもそもrefはbutton要素のクリック・イベントで使用する際に
+  //   Exampleコンポーネントで定義しているの、それをInputコンポーネントへ渡す。
+  //   そうすると先ほどの警告が解消される。
+  const ref = useRef();
+  return (
+    <>
+      <Input />
+      <button onClick={() => ref.current.focus()}>
+        インプット要素をフォーカスする
+      </button>
+    </>
+  );
+};
+export default Example;
+
+
+// その3
+import { useRef } from "react";
+// 2. こちらでpropsを受信する。
+// だが、上手くいかない。
+// refをpropsで受渡するのは推奨していない。
+const Input = ({ ref }) => {
+  return <input type="text" ref={ref} />
+};
+
+const Example = () => {
+  // 1. button要素でも使っているので、refの定義はこちらに据え置き
+  //    Inputコンポーネントへpropsとして渡す。
+  const ref = useRef();
+  return (
+    <>
+      <Input ref={ref} />
+      <button onClick={() => ref.current.focus()}>
+        インプット要素をフォーカスする
+      </button>
+    </>
+  );
+};
+export default Example;
+
+
+// その4-1
+import { useRef } from "react";
+// 2. 改名したpropsを受信する。
+const Input = ({ customRef }) => {
+  // 3. こちらも張り替え。
+  return <input type="text" ref={customRef} />
+};
+
+const Example = () => {
+  const ref = useRef();
+  return (
+    <>
+      {/* 1. 違う名称にしてやりとりする */}
+      <Input customRef={ref} />
+      <button onClick={() => ref.current.focus()}>
+        インプット要素をフォーカスする
+      </button>
+    </>
+  );
+};
+export default Example;
+
+
+// その4-2
+// 1. forwardRef関数を使う。forwardRef関数をimportする。
+import { useRef, forwardRef } from "react";
+// Inputコンポーネントで受信するrefをforwardRef関数の引数にする。
+// 渡ってきているのはInputコンポーネントのprops。
+// 関数コンポーネントの引数はprops、forwardRefの場合だけ第二引数でrefを取れる。
+// 引数に入れるのは、{props, ref}。
+// 渡ってきたrefは、特別なやりとりをしていることを明示的にしておく。
+const Input = forwardRef((props, ref) => {
+    return <input type="text" ref={ref} />
+});
+
+const Example = () => {
+  const ref = useRef();
+  return (
+    <>
+      <Input ref={ref} />
+      <button onClick={() => ref.current.focus()}>
+        インプット要素をフォーカスする
+      </button>
+    </>
+  );
+};
+export default Example;
+```
+
+## useInperativeHandle refへのアクセスを限定する方法
+
+```js
+// その1
+import { useRef, forwardRef, useImperativeHandle } from "react";
+
+/* POINT forwardRef
+子コンポーネント内の DOM に直接アクセスしたいときに使います。
+refは、親から子コンポーネントへprops形式で渡して参照するということができないため、
+参照したい場合は子コンポーネント内でfowardRefを使用する必要があります。
+
+useImperativeHandle
+refで使えるメソッドを制限する目的で使う。
+必要不可欠なハンドラー（メソッド）を使う宣言をする。
+*/
+const Input = forwardRef((props, ref) => {
+  // 使用したいメソッドを含むオブジェクトを含む関数を定義する。
+  // 書式はこう書くか、
+  // useImperativeHandle(ref, () => {
+  //   return {}
+  // })
+  useImperativeHandle(ref, () => ({
+    // 2. focusメソッドを使いたいのでここへ引っ張ってくる。
+    focus() {
+    }
+  }))
+  return <input type="text" ref={ref} />;
+});
+
+const Example = () => {
+  const ref = useRef();
+  return (
+    <>
+      <Input ref={ref} />
+      {/* 1. 必要不可欠なのでここのfocusメソッドを明示的に取り扱う。 */}
+      <button onClick={() => ref.current.focus()}>
+        インプット要素をフォーカスする
+      </button>
+    </>
+  );
+};
+export default Example;
+
+
+// その2
+import { useRef, forwardRef, useImperativeHandle } from "react";
+
+// 2. 親コンポーネントから渡ってきたrefと、
+const Input = forwardRef((props, ref) => {
+
+  // 3. コンポーネント内で別名でrefを初期化しておく。
+  const inputRef = useRef(); 
+
+  // 1. useImperativeHandle関数の第一引数のrefに対して、
+  //    第二引数のオブジェクトに含まれる『メソッドのみ』実行できることになる。
+  useImperativeHandle(ref, () => ({
+    focus() {
+    }
+  }))
+  // 2. 子コンポーネントから出力するrefを別のものにしておく。
+  // return <input type="text" ref={ref} />;
+
+  // 4. 子コンポーネントから出力するrefを別名にしておく。
+  return <input type="text" ref={inputRef} />;
+});
+
+const Example = () => {
+  const ref = useRef();
+  return (
+    <>
+      <Input ref={ref} />
+      <button onClick={() => ref.current.focus()}>
+        インプット要素をフォーカスする
+      </button>
+    </>
+  );
+};
+export default Example;
+
+
+// その3
+import { useRef, forwardRef, useImperativeHandle } from "react";
+
+const Input = forwardRef((props, ref) => {
+  const inputRef = useRef(); 
+  // 1. 親から渡ってきたrefを第一引数に渡し、　
+  useImperativeHandle(ref, () => ({
+    // 2. メソッドを定義する。呼び出すメソッドの名称も独自のものに変更しておく。
+    myFocus() {
+      inputRef.current.focus();
+      // ちゃんと別名でインスタンスを取れているか確認する。
+      console.log(inputRef, '取得できているようです。')
+    }
+  }))
+  return <input type="text" ref={inputRef} />;
+});
+
+const Example = () => {
+  const ref = useRef();
+  return (
+    <>
+      <Input ref={ref} />
+      {/* 3. 独自の名称になったメソッドをここで呼ぶ。 */}
+      <button onClick={() => ref.current.myFocus()}>
+        インプット要素をフォーカスする
+      </button>
+    </>
+  );
+};
+export default Example;
+```
+
+## 動画再生をもう一度やってみる
+
+```js
+import { useState, useRef, forwardRef, useImperativeHandle } from "react";
+// 1. 親コンポーネントから渡ってくるのはplay, stopメソッド。
+const Video = forwardRef(({ path }, ref) => {
+  // 2. Videoコンポーネントがわで別名にする。
+  const videoRef = useRef();
+  // 1. play, stopメソッドを別名で動かせるようにする。
+  useImperativeHandle(ref, () => ({
+    // 5. 別名にしてメソッドを定義（動きを定義）
+    myPlay(){
+      videoRef.current.play()
+    },
+    myStop(){
+      videoRef.current.pause()
+    }
+  }));
+
+  return (
+    // 3. 返す要素へvideoRefを設定する。
+    <video style={{ maxWidth: "100%" }} ref={videoRef}>
+      <source src={path}></source>
+    </video>
+  );
+});
+
+const Example = () => {
+  const [playing, setPlaying] = useState(false);
+  // 2. ここで定義されるrefを
+  const ref = useRef();
+
+  return (
+    <div>
+      <h3>練習問題</h3>
+      <p>useRef、useImperativeHandle、forwardRefを使って完成系の動画再生機能を作成してください。※useImperativeHandleでplay(再生)、stop(停止)メソッドを定義すること。</p>
+      <Video ref={ref} path="./sample.mp4" />
+      <button
+        // 6. ボタンがクリックされた時の状態は、
+        onClick={() => {
+          if(playing) {
+            ref.current.myStop();
+          } else {
+            ref.current.myPlay();
+          }
+          setPlaying((prev) => !prev);
+        }}
+      >
+        {playing ? "Stop" : "Play"}
+      </button>
+    </div>
+  );
+};
+export default Example;
+```
+
 
