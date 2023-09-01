@@ -15,8 +15,8 @@ const Example = () => {
   }
 
   const newNum = double(num);
-  console.log('newNum', newNum, 'num', num)
-  console.log(newNum === num);
+  // console.log('newNum', newNum, 'num', num)
+  // console.log(newNum === num);
   return (
     <>
       <div>Immutability</div>

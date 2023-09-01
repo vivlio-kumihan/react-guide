@@ -4579,3 +4579,294 @@ export default Example;
 ```
 
 
+## 関数型プログラミング
+
+### 関数型プログラミングとは
+
+宣言型プログラミング　>　関数型プログラミング
+
+上から下への制御（手続型の制御）をなるべく関数に分離（隠蔽）し、やりたいことに集中できるようにするプログラミング手法
+
+```js
+let nums = [1,2,3];
+let doubleNums = nums.map(num => num * 2);
+```
+
+ループ制御: mapメソッドが担当
+やりたいこと: 関数で定義（開発者が担当）
+
+### 関数型プログラミングのキーワード
+
+- 値の状態管理と処理を分離
+  - 状態と処理は切り離す。
+- 純粋関数
+  - 特定の入力には特定の処理を返す。
+- 普遍性
+  - 一度設定した値は書換えない。
+
+### 値の状態管理と処理を分離
+
+関数　それぞれに定義
+状態　それぞれに定義
+
+その状態を関数に渡し渡し、数珠繋ぎに処理して結果を導く。
+
+```
+funcA(data) => funcB(data) => funcC(data) => 結果
+```
+
+### 同じことをコードで比較
+
+```js
+const Example = () => {
+  // const nums = [1, 2, 3];
+  // const sum = () => nums.reduce((accu, curr) => accu + curr);
+
+  // 関数型プログラミング
+  // Accumilation（蓄積）=> accu
+  // current => curr
+  // 状態を生成させておき、
+  const nums = [1, 2, 3, 4];
+  // やりたいカタチにするための関数を作る。
+  const sum = (arr) => { 
+    return arr.reduce((accu, curr) => accu + curr)
+  };
+
+  // オブジェクト指向プログラミング
+  const numObj = {
+    nums: [1, 2, 3, 4],
+    sum() {
+      const nums = this.nums;
+      let sumVal = 0;
+      nums.forEach(n => { sumVal += n })
+      return sumVal;
+    }
+  };
+  return (
+    <>
+      <h3>状態管理と処理を分離</h3>
+      <p>状態（データ）と処理（やりたいこと）は切り離す</p>
+      <p>{`result: ${numObj.sum()}`}</p>
+      <p>{`result: ${sum(nums)}`}</p>
+
+    </>
+  );
+};
+export default Example;
+```
+
+##  関数型（純粋関数）
+
+- fn(決まった引数) -> 決まった戻り値
+- 関数外の状態（データ）は参照・変更しない。
+- 関数外に影響を及ぼさない。
+- 引数で渡された値を変更しない。
+- 上記の要件を満たさない操作は「副作用」と呼ぶ。
+
+### fn(決まった引数) -> 決まった戻り値原則
+
+与えた引数に対して決まった戻り値が戻っており純粋関数と言える。
+
+```js
+const Example = () => {
+  const val1 = 2, val2 = 10;
+  const add = (val1, val2) => {
+    return val1 + val2; 
+  };
+  return (
+    <>
+      <h3>関数定義からひもとく</h3>
+      <h4>引数を足し算する関数を作る</h4>
+      <p>純粋関数: {add(val1, val2)}</p>
+    </>
+  );
+};
+export default Example;
+```
+
+### 関数外の状態（データ）は参照・変更しないしない原則
+
+```js
+// 関数に変数を定義していないが、
+// 外部の変数の値を変えると結果が変更されてしまう。
+// これを純粋関数ではないという考え方をする。
+// 確かにこれでは不測の事態が起きるわな。
+
+const Example = () => {
+  // val2が初期化されており、
+  const val1 = 2, val2 = 10;
+  // 引数にval2を取ってもないけど、値はどんどん変わってしまう。
+  // 処理が引数に依存していない悪い例
+  const add = (val1) => {
+    return val1 + val2; 
+  };
+  return (
+    <>
+      {/* 変数val2は呼んでないし、 */}
+      <p>純粋関数: {add(val1)}</p>
+    </>
+  );
+};
+export default Example;
+```
+
+### 関数外に影響を及ぼさない原則
+
+```js
+const Example = () => {
+  const val1 = 2, val2 = 3;
+  // 関数の外で変数を定義し、結果が関数外へ飛び出てしまったり、
+  let result;
+  const add = (val1) => {
+    result = val1 + val2; 
+    // コンソール・ログを関数外のコンソールへ送信した入りすることが、
+    // 副作用と呼ばれる操作になる。
+    console.log(result)
+    return val1 + val2; 
+  };
+  return (
+    <>
+      <p>純粋関数: {add(val1, val2)}</p>
+    </>
+  );
+};
+export default Example;
+```
+
+### 引数で渡された値を変更しない原則
+
+```js
+const Example = () => {
+  // 関数型（純粋関数）は、
+  // 引数で渡された値を変更しない。
+  // Immutabilityの保持という。
+  const num = { val: 2 }
+  const double = (num) => {
+    num.val = num.val * 2;
+    return num;
+  }
+  const newNum = double(num);
+  console.log('newNum', newNum, 'num', num)
+  // => newNum {val: 4} num {val: 4}
+  return (
+    <>
+      <h3>Immutability(不変性)</h3>
+      <p>引数で渡ってきたオブジェクトを変更しない！</p>
+    </>
+  );
+};
+export default Example;
+```
+
+Immutabilityを保持するためのコードだった。
+
+```js
+const double = (num) => {
+  num = { ...num }
+  num.val = num.val * 2;
+  return num;
+}
+```
+
+## Immutability
+
+Immutableな値
+- 元の値は変わらないもの。
+  - 文字列、数値、BigInt、真偽値、undefined、シンボル
+
+変数に値を代入すると値は変わる。これは、値が変わっているわけではない。変数の参照先が変わっただけのこと。値が変わったわけではない。
+
+Mutableな値
+- 元の値が変わるもの。
+  - Object、Array
+
+言葉のあややなこれは。
+
+```js
+let val = [1, 2, 3];
+val.push(4)
+// => [1, 2, 3, 4]
+```
+
+変数が『参照』する先は『変わらない』が、
+配列の『中身』が『変わって』いる。
+
+結局、Mutableな値をImmutableにするとは？
+
+変数が値への参照を変更し、元の値に影響を与えないようにすることをいう。
+人生で初めてめちゃわかった。
+
+
+### 純粋ではない場合
+
+```js
+// 1. グローバルな範囲で変数を定義して、
+let value = 0;
+
+// 2. 子コンポーネントに変数の値に1を足す仕掛けを作り、
+const Child = () => {
+  value++;
+  return (
+    <div>{value}</div>
+  )
+}
+
+// コンポーネントは純関数で定義しないといけない原則
+// コンポーネントは、propsを受け取ってJSXで返す。
+// だから、コンポーネント外で初期化した変数を使ってはいけない。
+// 実証してみる。
+const Example = () => {
+  return (
+    <>
+    <div>{value}</div>
+    {/* 子コンポーネントを刺すと意図しない挙動をする。
+        1を足した値、つまり1が三つを期待しているのに。。。1 2 3 と出力してしまう。 */}
+    <Child /> 
+    <Child /> 
+    <Child /> 
+    </>
+  );
+};
+export default Example;
+```
+
+### 純粋！
+```js
+let value = 0;
+
+const Child = () => {
+  value++;
+  return (
+    <div>{value}</div>
+  )
+}
+// 2. 親から送信されたpropsを受診して、
+const ChildPure = ({ value }) => {
+  return (
+    // 3. JSXで出力準備。
+    <div>{value}</div>
+  )
+}
+const Example = () => {
+  // 4. 親コンポーネントのスコープの範囲内で変数を定義し直して、
+  let value = 0
+  return (
+    <>
+    <div>{value}</div>
+    <Child /> 
+    <Child /> 
+    <Child /> 
+    {/* 1. propsを設定して、 */}
+    {/* 6. あとは、出力する。 */}
+    <ChildPure value={++value} /> 
+    <ChildPure value={++value} /> 
+    <ChildPure value={++value} /> 
+    </>
+  );
+};
+export default Example;
+
+// jsの知識
+// ++value 1から始める
+// value++ 0から始める
+```
