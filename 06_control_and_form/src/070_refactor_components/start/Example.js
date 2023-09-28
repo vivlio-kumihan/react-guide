@@ -1,27 +1,34 @@
 import { useState } from "react";
-import AnimalList from "./components/AnimalList"
-import InputFilterVal from "./components/InputFilterVal"
 
 const Example = () => {
-  const petArray = ["Dog", "Cat", null ,"Rat"]
-  const [filterVal, stateFilterVal] = useState("")
-  const FliteredAnimal = petArray.filter((pet) => {
-          const petStr = pet ?? ""
-          const isMatch = petStr.indexOf(filterVal) !== -1;
-          return isMatch;
-        })
+  const animals = ["Dog", "Cat", "Rat"];
+
+  const [filterVal, setFilterVal] = useState("");
+
   return (
     <>
-      {/* 11. input要素もコンポーネント化する。 */}
-      {/* InputFilterValコンポーネントを作成してコードを移動する。 */}
-      {/* <input
-            type="text"
-            value={ filterVal }
-            onChange={ (e) => stateFilterVal(e.target.value) }
-          /> */}
-      <InputFilterVal filterState={ [filterVal, stateFilterVal] }/>
-      <AnimalList petArray={ FliteredAnimal } />
+      <input
+        type="text"
+        value={filterVal}
+        onChange={(e) => setFilterVal(e.target.value)}
+      />
+      <ul>
+        {animals
+          .filter((animal) => {
+            const isMatch = animal.indexOf(filterVal) !== -1;
+            return isMatch;
+          })
+          .map((animal) => {
+            return (
+              <li key={animal}>
+                {animal}
+                {animal === "Dog" && "★"}
+              </li>
+            );
+          })}
+      </ul>
     </>
   );
 };
+
 export default Example;

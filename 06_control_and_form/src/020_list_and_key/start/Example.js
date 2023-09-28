@@ -14,8 +14,14 @@ const Example = () => {
   return (
     <>
       <ul>
-        {helloAnimals}
-        {animals.map((animal) => <li key={ animal }>Hello, {animal}</li>)}
+        {/* <li>{animals[0]}</li>
+        <li>{animals[1]}</li>
+        <li>{animals[2]}</li> */}
+        {/* {animalList}
+        {helloAnimals} */}
+        {/* {animalList} */}
+
+        {animals.map((animal) => <li>Hello, {animal}</li>)}
       </ul>
     </>
   );

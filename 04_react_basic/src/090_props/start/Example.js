@@ -1,11 +1,5 @@
-import Lesson from "./components/Lesson";
+import Child from "./components/Child";
 
-const Example = () => {
-  return (
-    <>
-      <Lesson color={"red"} />
-    </>
-  )
-}
+const Example = () => <Child />;
 
 export default Example;

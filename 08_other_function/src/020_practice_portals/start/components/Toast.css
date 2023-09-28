@@ -10,7 +10,7 @@
 }
 .App-start .container .toast.is-visible {
   transform: translateY(0);
-  transition: transform .3s ease-in;
+  transition: transform 0.3s ease-in;
   display: block;
 }
 

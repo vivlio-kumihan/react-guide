@@ -1991,38 +1991,27 @@ const Example = () => {
   // onChange
   // onBlur
 
-  // `onClick`に対してコールバック関数`=()`を定義
-  // これをイベントハンドラーという。
+  // `onClick`に対してコールバック関数`=()`を定義する。
+  // イベントの発火装置を設置する。
+  // これの関数をイベントハンドラーという。
   // `onClick`というイベントのリスナーを
   // `clickHandler`という名称で作成し登録する（引数にとる）。
 
   // コールバック関数でやりがちなこと。
-  // - クリックしたら`clickHandler`というイベントハンドラーを呼ぶという意味。
-  // - クリックイベントの中に`clickHandler`関数が入っているので、クリックするしないに関わらずとりあえず関数実行するわという意味。
-  // `clickHandler` => `clickHandler`という名前の関数
+  // - クリックのイベントを起こしたら、`clickHandler`というイベントハンドラーを発火させる。
+
+// JSXに埋め込む際に意味が違う。
+// onClickイベントに、
+  // `clickHandler` => `clickHandler`という名前の関数を渡す。
   // `clickHandler()` => `clickHandler`関数を実行する
-  // この違いを理解する。
-
-  // `<button onClick={ clickHandler() }>Click</button>`
-  // `JSX`が書かれた地点で関数を実行するという意味。
-  // イベントハンドラーには、関数の戻り値が設定される。
-  // 何が返されるか？
-  // ```js
-  //   const clickHandler = () => {
-  //      alert("on click button")
-  //   }
-  // ```
-  //  この関数には`return`が書かれていないから、
-  // `console.log(clickHandler())` => `undefined`
-
+  // 意味が全く違う。
   const clickHandler = () => {
     alert("on click button")
   }
   
   return (
     <>
-    <button onClick={ clickHandler }>Click</button>
-    <button onClick={ clickHandler }>Click</button>
+    <button onClick={clickHandler}>Click</button>
     </>
   );
 };
@@ -2103,6 +2092,7 @@ return (
 関数には今注目しているインスタンスに適用できるものが設定されている。
 その関数をコールバック関数として、引数に`e.target.value`を渡すと欲しい値が取れる寸法。
 `[value, function]`
+クラスの初期化でやるゲッターとセッターみたいな感じ。
 
 ```js
 import { useState } from "react"
@@ -2125,6 +2115,7 @@ export default Example
 ```
 
 ### その　3
+__覚えるべきコードはこちら__
 分割代入で効率と判読性の向上
 `let [val, setFunc] = useState(0)`
 このように変更し、該当する箇所へ変数を入れ替え、不要なコードを取り去る。
@@ -2156,7 +2147,7 @@ export default Example
 
 ```js
 const Example = () => {
-  // 1. 初期化していない変数を設定
+  // 1. 初期値を設定しない変数を設定
   let tmpVal
   return (
     <>
@@ -2166,8 +2157,8 @@ const Example = () => {
           // 3. 入力というイベントが起こったらその入力値を変数に代入させる。
           tmpVal = e.target.value
         }}
-      // 4. ここで値を貼り付けられたらいいのだができない。
-      //    それは、イベントを駆動させると`Example`propsを再度実行する仕様だから。
+      // 4. input要素に値を入力する度に再レンダリングが実行されるので、下にあるJSXの中の変数へ値は渡らない。
+      //    イベントを駆動させると`Example`コンポーネントを再度実行する仕様だから。
       //    再度実行ということは、`let tmpVal`の処理で変数の中身は空になり、
       //    `{ tmpVal }`は、空の状態を出力する、つまり、反応していないように見えるというわけ。
       /> = { tmpVal }
@@ -2201,18 +2192,14 @@ export default Example
 
 ## 複数のStateに対応・Stateは最上位
 
+複数の状態をセッターゲッターできる。
+注意点は、コンポーネントの最上位の位置でしか呼ぶことができない。
+
 ```js
 import { useState } from "react"
 import "./Example.css"
 
-// イベントごとに関数の引数に何が必要かが異なる。
-// それはそうだ、イベントごとに何を引数にとり、どのように動作させるかを定義しているのだから。
-// - onChangeは、e.target.valueをとる。
-// - onClickは、クリックした回数（数値）をどうするのか（式）をとる。
-// - 複数の作成に対応。変数・関数とも変更すれば解決。
-
 const Example = () => {
-  // コンポーネントの最上位の位置でしか呼ぶことができない。
   let [countA, setCountA] = useState(0)
   let [countB, setCountB] = useState(0)
   let [countC, setCountC] = useState(0)
@@ -2250,6 +2237,7 @@ const Example = () => {
 export default Example;
 ```
 
+# 暗記　お題：　カウントのイベントを状態管理する
 ## 配列のState
 
 表示する部分を作成すると言われたらすぐに思い浮かべよう。
@@ -2301,9 +2289,9 @@ const Example = () => {
   }
   return (
     <>
-      <p>現在のカウント数: { count }</p>
-      <button onClick={ countUp }>Button Up</button>
-      <button onClick={ countDown }>Button Down</button>
+      <p>現在のカウント数: {count}</p>
+      <button onClick={countUp}>Button Up</button>
+      <button onClick={countDown}>Button Down</button>
     </>
   )
 };
@@ -2311,7 +2299,9 @@ const Example = () => {
 export default Example;
 ```
 
-詳細説明
+## 詳細説明
+
+prevState関数の話もある。
 
 ```js
 const Example = () => {
@@ -2349,6 +2339,7 @@ JSには型がある。
 
 ### その　1
 
+#### オブジェクト（DBなんかを扱うことを想定して）をソースとして、input要素に値を入力する『イベント』をきっかけに『状態』を管理するコードを書く。
 - 現在の関数コンポーネント`Example`は、オブジェクトを持っている。
 - そのオブジェクトを変更可能にするために状態を保持する。
 - オブジェクトの値をJSXで表現する。
@@ -2357,10 +2348,13 @@ JSには型がある。
 import { useState } from "react";
 
 const Example = () => {
+  // DBをオブジェクトに設定して、
   const personObj = { name: "Tom", age: 18 };
+  // オブジェクトを状態管理にセットする。ゲッターセッターの設定。
   const [person, sttPerson] = useState(personObj)
   return (
     <>
+      // 結果を表示させるゲッター部分。
       <h3>Name: { person.name }</h3>
       <h3>Age: { person.age }</h3>
     </>
@@ -2377,19 +2371,19 @@ export default Example;
 ```js
 const Example = () => {
   const personObj = { name: "Tom", age: 18 }
-  const [person, sttPerson] = useState(personObj)
+  const [person, setPerson] = useState(personObj)
   const changeName = (e) => {
-    sttPerson({ name: e.target.value, age: person.age })
+    setPerson({ name: e.target.value, age: person.age })
   }
   const changeAge = (e) => {
-    sttPerson({ name: person.name, age: e.target.value })
+    setPerson({ name: person.name, age: e.target.value })
   }
   return (
     <>
-      <h3>Name: { person.name }</h3>
-      <h3>Age: { person.age }</h3>
-      <input type="text" value={ person.name } onChange={ changeName } />
-      <input type="number" value={ person.age } onChange={ changeAge } />
+      <h3>Name: {person.name}</h3>
+      <h3>Age: {person.age}</h3>
+      <input type="text" value={person.name} onChange={changeName} />
+      <input type="number" value={person.age} onChange={changeAge} />
     </>
   )
 }
@@ -2404,6 +2398,7 @@ const Example = () => {
   const personObj = { name: "Tom", age: 18 }
   const [person, sttPerson] = useState(personObj)
   const changeName = (e) => {
+    // オブジェクトで状態を持ったら、セッターの設定時もオブジェクトの形にして変更する。
     sttPerson({ name: e.target.value, age: person.age })
   }
   const changeAge = (e) => {
@@ -2741,6 +2736,9 @@ const Example = () => {
     </>
   )
 }
+
+
+
 const Count = ({ title }) => {
   const [count, setCount] = useState(0);
   const countUp = () => {
@@ -4631,7 +4629,7 @@ const Example = () => {
   const sum = (arr) => { 
     return arr.reduce((accu, curr) => accu + curr)
   };
-
+  // 用語：accumulation 累積
   // オブジェクト指向プログラミング
   const numObj = {
     nums: [1, 2, 3, 4],
