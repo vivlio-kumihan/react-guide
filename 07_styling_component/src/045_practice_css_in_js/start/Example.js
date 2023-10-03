@@ -1,33 +1,39 @@
+// Q1. FirstButtonのbackgroudをpinkにしてください。
+// Q2. FirstButtonを継承したSecondButtonを作成し、backgroudをredに、colorをwhiteにしてください。{" "}
+// Q3. SecondButtonを継承したThirdButtonを作成し、props.darkがある場合のみbackgroudがblackに、ない場合はgreenになるようにしてください。
+
 import styled from "styled-components";
+import { useState } from "react";
 
 const FirstButton = styled.button`
   display: inline-block;
-  border-radius: 3px;
+  width: 11rem;
   padding: 0.5rem 0;
   margin: 0.5rem 1rem;
-  width: 11rem;
+  font-weight: bold;
+  background-color: pink;
+  border-radius: 3px;
   border: none;
 `;
 
+const SecondButton = styled(FirstButton)`
+  color: #fff;
+  background-color: red;
+`;
+
+const ThirdButton = styled(SecondButton)`
+  background-color: ${({dark}) => dark ? "black" : "green"};
+`;
+
 const Example = () => {
+  // const [dark, setDark] = useState(true);
+
   return (
     <>
-      <h3>練習問題</h3>
-      <p>
-        記述を変更し、完成コードと同じ状態になるようにしてください。
-        <ul>
-          <li>Q1. FirstButtonのbackgroudをpinkにしてください。</li>
-          <li>
-            Q2.
-            FirstButtonを継承したSecondButtonを作成し、backgroudをredに、colorをwhiteにしてください。{" "}
-          </li>
-          <li>
-            Q3.
-            SecondButtonを継承したThirdButtonを作成し、props.darkがある場合のみbackgroudがblackに、ない場合はgreenになるようにしてください。
-          </li>
-        </ul>
-      </p>
       <FirstButton>ボタン1</FirstButton>
+      <SecondButton>ボタン2</SecondButton>
+      <ThirdButton>ボタン3</ThirdButton>
+      <ThirdButton dark>ボタン4</ThirdButton>
     </>
   );
 };

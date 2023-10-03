@@ -9,10 +9,10 @@
 * onChange
 * onBlur
 
-`onClick`に対してコールバック関数`const funcName = () => {}`を定義する。
+`onClick`属性（props）に対してコールバック関数`const funcName = () => {}`を定義する。
 イベントの発火装置を設置する。
 これの関数をイベントハンドラーという。
-`onClick`というイベントのリスナーを
+`onClick`属性（props）というイベントのリスナーを
 `clickHandler`という名称で作成し登録する（引数にとる）。
 
 コールバック関数でやっていることは、

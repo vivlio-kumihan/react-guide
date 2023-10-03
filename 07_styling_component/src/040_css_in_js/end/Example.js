@@ -22,7 +22,7 @@ const StyledButton = styled.button`
   /* POINT valueを関数にすることで、引数にpropsを受け取ることができる。
   { isSelected } の部分を変更することで受け取る名前を変更することができる。
    */
-  background-color: ${({ isSelected }) => (isSelected ? "pink" : "darkcyan")};
+  /* backgroundColor: ${({ isSelected }) => (isSelected ? "pink" : "darkcyan")}; */
   transition: all 0.3s ease-out;
 
   /* POINT 疑似クラスの追加 */
