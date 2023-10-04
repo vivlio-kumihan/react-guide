@@ -82,7 +82,7 @@ const Modal = ({ handleCloseClick }) => {
     <div className="modal">
       <div className="modal__content">
         <p>モーダル</p>
-        {/* クリックのイベントハンドラにpropsで渡ってきた無名関数を私実行。 */}
+        {/* クリックのイベントハンドラにpropsで渡ってきた無名関数を実行。 */}
         {/* 状態をfalseに変更すると言うこと。 */}
         {/* `{modalOpen && (...)}`が`false`になって`ModalPotal`コンポーネントは表示されなくなる。 */}
         <button type="button" onClick={handleCloseClick}>
@@ -117,6 +117,7 @@ const Example = () => {
   const [modalOpen, setModalOpen] = useState(false);
 
   return (
+    // 親子関係の確認重要
     // div > button要素のクリックイベントがバグリングして親要素のdivも反応する例
     // 最上位のdiv要素が反応している。
     <div onClick={() => console.log("最上位のdiv要素が反応している。")}>
@@ -131,10 +132,13 @@ const Example = () => {
         モーダルを表示する
       </button>
       {modalOpen && (
+        // 親子関係の確認重要
         // ModalPotalには反応しない。
         <ModalPotal onClick={() => console.log("ModalPotalには反応しない。")}>
           // ModalPotalの子要素にも反応しない。
-          <Modal handleCloseClick={() => setModalOpen(false)} onClick={() => console.log("ModalPotalの子要素にも反応しない。")}/>
+          <Modal  handleCloseClick={() => setModalOpen(false)} 
+                  // 親子関係の確認重要
+                  onClick={() => console.log("ModalPotalの子要素にも反応しない。")}/>
         </ModalPotal>
       )}
     </div>
@@ -151,6 +155,7 @@ import "./Modal.css";
 
 const Modal = ({ handleCloseClick }) => {
   return (
+    // 親子関係の確認重要
     // 真上のもう一つ上のdiv要素が反応している。
     <div className="modal" onClick={() => console.log("真上のもう一つ上のdiv要素が反応している。")}>
       // 真上のdiv要素が反応している。
@@ -199,6 +204,7 @@ const Example = () => {
       {toastOpen && (
         <TostPortal>
           <Toast
+            // クラスの付け替え部分頻度多くなるはず。工程を暗記。
             // クラスの付け替えをする部分。状態でやるんだね。
             visible={toastOpen}
             handleCloseClick={() => setToastOpen(false)}
@@ -216,6 +222,7 @@ export default Example;
 import "./Toast.css";
 
 const Toast = ({ visible, handleCloseClick }) => {
+  // クラスの付け替え部分頻度多くなるはず。工程を暗記。
   // クラスの付け替えをする部分。こうやるんだ。
   const toastClassName = visible ? "toast is-visible" : "toast";
   return (
@@ -239,6 +246,11 @@ export default Toast;
 
 ## useRef
 
+useRefとは、再レンダリングを発生させずに値を保持する方法である。
+
+useStateでは、stateの値を更新する際に更新関数を実行すると再レンダリングが発生する。
+useRefでは発生しない。
+
 HTMLでは出来るが、Reactでは出来ないこと。
 button要素をクリックするとinput要素がアクティブになる。
 
@@ -247,6 +259,72 @@ button要素をクリックするとinput要素がアクティブになる。
 ```jsx
 import { useState, useRef } from "react";
 
+// Case1コンポーネントの定義
+const Case1 = () => {
+  // 状態の初期化
+  const [value, setValue] = useState("");
+  // DOM参照の初期化
+  const inputRef =useRef();
+  
+  return (
+    <>
+      <h3>ユースケース1</h3>
+      {/* `input要素`の`ref属性`に`inputRef`を設定することで、 */}
+      {/* 『この`input要素`』のDOM要素の参照を`inputRef`が保持する。 */}
+      {/* なお、`useRefVar.current`プロパティにアクセスすると */}
+      {/* そこで使えるメソッドがわかる。 */}
+      <input  ref={inputRef}
+              onChange={(e) => setValue(e.target.value)} />
+              type="text" 
+              value={value} 
+      {/* 全く関係のない要素にクリックイベントで何が発火されるかやってみると、 */}
+      {/* `{current: input}`となり`button要素`が`input要素`のDOM要素の参照をしっかりと捕まえる。 */}
+      <button onClick={() => console.log(inputRef)}>
+        インプット要素をフォーカスする
+      </button>
+    </>
+  );
+};
+
+const Example = () => {
+  return (
+    <>
+      <Case1 />
+    </>
+  );
+};
+
+export default Example;
+```
+
+###　対象の要素の値を取り出してみる
+
+```jsx
+return (
+  <div>
+    <h3>ユースケース1</h3>
+    <input  type="text" 
+            value={value} 
+            ref={inputRef} 
+            onChange={(e) => setValue(e.target.value)}
+    />
+    {/* 例1. input要素のDOMを捕まえていることがわかる。 */}
+    <button onClick={() => console.log(inputRef)}> 
+    {/* 例2. この`inputRef`に対して`current`メソッドを充てることで、*/}
+    {/* 属性を参照できる。*/}
+    {/* 対象の要素のスクリーン上で表示されている高さの参照は以下のようにする。 */}
+    {/* これで蛇腹のリストがややこしい手続きなしに作れる。素晴らしい。 */}
+    <button onClick={() => console.log(inputRef.current.offsetHeight) }>
+      インプット要素をフォーカスする
+    </button>
+  </div>
+);
+```
+
+### クリックしたらインプットが入力待ち状態になるをやる
+
+```jsx
+import { useState, useRef } from "react";
 
 const Case1 = () => {
   const [value, setValue] = useState("");
@@ -255,12 +333,15 @@ const Case1 = () => {
   return (
     <div>
       <h3>ユースケース1</h3>
-      {/* `input要素`の`ref属性`に`inputRef`を設定することで、 */}
-      {/* このDOM要素の参照を`inputRef`が保持する。 */}
-      <input type="text" value={value} ref={inputRef} onChange={(e) => setValue(e.target.value)} />
-      {/* 全く関係のない要素にクリックイベントで何が発火されるかやってみると、 */}
-      {/* `{current: input}`となりしっかりと捕まえよる。 */}
-      <button onClick={() => console.log(inputRef)}>
+      <input  type="text" 
+              value={value} 
+              ref={inputRef} 
+              onChange={(e) => setValue(e.target.value)}
+      />
+      {/* 普通に`input`要素が持っているメソッドが使える。 */}
+      {/* ここでは、`input`要素が持っている`focus()`メソッドを使って、*/}
+      {/* button要素とは何の関係もないinput要素を`focus`させる。*/}
+      <button onClick={() => inputRef.current.focus()}>
         インプット要素をフォーカスする
       </button>
     </div>
@@ -278,5 +359,105 @@ const Example = () => {
 export default Example;
 ```
 
-### やってみる
+### 動画を再生してみる
 
+```jsx
+import { useState, useRef } from "react";
+
+const Case2 = () => {
+  // 動画再生の状態管理を生成する。
+  const [playing, setPlaying] = useState(false);
+  // 参照を生成する。
+  const videoRef = useRef();
+  const style = { width: "100%" };
+
+  return (
+    <>
+      {/* イベントの受信 `ref`プロップスに`videoRef`を設定 */}
+      {/* `videoRef`に紐づいたイベントが入ってくる。 */}
+      {/* この場合は、ボタンを押したら動画の再生か停止のイベント */}
+      <video style={style} ref={videoRef}>
+            {/* buildされる実際のサイトはpublicディレクトリで運用されている。 */}
+            {/* だからpathは以下のようになる。 */}
+        <source src="./sample.mp4"></source>
+      </video>
+      {/* -----宿題-----　トグルのやり方を調べる。パターンを抽出して暗記してしまう。 */}
+      <button onClick={() => {
+        if (playing) {
+          videoRef.current.pause();
+        } else {
+          videoRef.current.play();
+        }
+        // トグル部
+        setPlaying(prevState => !prevState)
+      }}>
+        {/* トグル部 */}
+        {playing ? "Stop" : "Play"}
+      </button>
+    </>
+  );
+};
+
+const Example = () => {
+  return (
+    <>
+      <Case2 />
+    </>
+  );
+};
+
+export default Example;
+```
+
+### 再レンダリングするかしないか　時間を調べてみて確かめる
+
+```jsx
+import { useState, useRef } from "react";
+// 現在時刻を文字列で取得する。
+const createTimeStamp = () => new Date().toLocaleString();
+// const createTimeStamp = () => new Date().getTime();
+// Case3コンポーネントの設定
+const Case3 = () => {
+  // 最初にリロードされた時の時間とその状態を設定する。
+  const [timeState, setTimeState] = useState(createTimeStamp());
+  // onClickプロップス・イベントリスナーに敷設した関数。こちらで定義。
+  // クリックするたびに再レンダリングされて値が変わっていく。
+  const updateState = () => {
+    setTimeState(createTimeStamp());
+  };
+  
+  // 今回のrefは、最初にリロードされた時の時間の文字列を設定する。
+  const timeRef = useRef(createTimeStamp());
+  const updateTimeRef = () => {
+    // onClickプロップス・イベントリスナーに敷設した関数。こちらで定義。
+    // クリックイベントが次々に発生して`timeRef.current`には新しい値が入ってくるが、
+    // スクリーン上の表示には反映されない。
+    timeRef.current = createTimeStamp();
+    console.log("timeRef.current => ", timeRef.current);
+  };
+
+  return (
+    <>
+      <h3>ユースケース3</h3>
+      <p>
+        state: {timeState}
+        <button onClick={updateState}>更新</button>
+      </p>
+      <p>
+        ref: {timeRef.current}
+        <button onClick={updateTimeRef}>更新</button>
+      </p>
+    </>
+  );
+};
+
+const Example = () => {
+  return (
+    <>
+      <Case3 />
+    </>
+  );
+};
+
+export default Example;
+```
