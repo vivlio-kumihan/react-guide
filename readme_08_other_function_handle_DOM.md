@@ -461,3 +461,145 @@ const Example = () => {
 
 export default Example;
 ```
+
+### 親コンポーネントから子コンポーネントへDOMを操作する
+
+__POINT forwardRef__
+
+子コンポーネント内の DOM に直接アクセスしたいときに使います。
+refは、親から子コンポーネントへprops形式で渡して参照するということができないため、参照したい場合は子コンポーネント内でfowardRefを使用する必要があります。
+
+```jsx
+// 基本的には、refの子コンポーネントへの持ち出しはやらない前提。
+// どうしても必要であれば`forwardRef()`関数を使う
+
+import { useRef, forwardRef } from "react";
+
+const Example = () => {
+  const ref = useRef();
+  return (
+    <>
+      {/* 接木の子コンポーネントのプロップスに`ref`を設定 */}
+      <Input ref={ref} />
+      <button onClick={() => ref.current.focus()}>
+        インプット要素をフォーカスする
+      </button>
+    </>
+  );
+};
+// 子コンポーネントを生成する際のコールバック関数を
+// forwardRef()の引数にして解決する。
+// `(props, ref) => {return(...)}`
+const Input = forwardRef((props, ref) => {
+  return (<input type="text" ref={ref} />);
+});
+
+export default Example;
+```
+
+__useImperativeHandle__
+
+```jsx
+// refの問題点
+// `ref.current`にはそのインスタンスごとに多くのメソッドがある。
+// 開発メンバーが複数になり、このコードを書いた本人の意図しない
+// 使われ方をしてバグを発生させる危険性がある。
+// それを回避するのがuseImperativeHandle()関数。
+// refを使う操作を限定するための関数。
+// このコードで意図しない使われ方があるのは、ref.current.focus()
+
+// useImperativeHandle()関数は子コンポーネントで使う
+
+import { useRef, forwardRef, useImperativeHandle } from "react";
+
+const Example = () => {
+  const ref = useRef();
+  return (
+    <>
+      <Input ref={ref} />
+      <button onClick={() => ref.current.focus()}>
+        インプット要素をフォーカスする
+      </button>
+    </>
+  );
+};
+// 渡ってきたrefに対してuseImperativeHandle()関数を設定する。
+const Input = forwardRef((props, ref) => {
+  // refはそのまま使わない。新たに用意する。
+  const inputRef = useRef();
+  // 第一引数には、渡ってきたref
+  // 第二引数には、使用したいメソッドを含むオブジェクトを返す関数を敷設する。
+  // // 短縮せずに書くと
+  // useImperativeHandle(ref, () => {
+  //   return {
+  //     // ここで`focus()`メソッドを定義する
+  //     focus: function() {
+  //       inputRef.current.focus();
+  //     }
+  //   };
+  // });
+  // 短縮して書くと『オブジェクトを返す関数』を『{}』で囲み
+  // それを『()』で囲む
+  useImperativeHandle(ref, () => (
+    {
+      myFocus() {
+        inputRef.current.focus();
+      }
+    }
+  ));
+  return <input type="text" ref={inputRef} />;
+});
+
+export default Example;
+```
+
+## videoのコードをuseImperativeHandle()関数使ってやってみる
+
+```jsx
+import { useState, useRef, forwardRef, useImperativeHandle } from "react";
+
+const Example = () => {
+  const [playing, setPlaying] = useState(false);
+  const ref = useRef();
+
+  return (
+    <div>
+      <Video ref={ref} path="./sample.mp4" />
+      <button
+        onClick={() => {
+          if (playing) {
+            ref.current.myPause();
+          } else {
+            ref.current.myPlay();
+          }
+          setPlaying((prev) => !prev);
+        }}
+      >
+        {playing ? "Stop" : "Play"}
+      </button>
+    </div>
+  );
+};
+
+const Video = forwardRef(({ path }, ref) => {
+  const videoRef = useRef();
+  useImperativeHandle(ref, () => (
+    {
+      myPlay() {
+        videoRef.current.play();
+      },
+      myPause() {
+        videoRef.current.pause();
+      }
+    }
+  ));
+
+  return (
+    <video style={{ maxWidth: "100%" }} ref={videoRef}>
+      <source src={path}></source>
+    </video>
+  );
+});
+
+export default Example;
+```
