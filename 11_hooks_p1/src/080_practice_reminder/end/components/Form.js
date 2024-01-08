@@ -13,7 +13,8 @@ const Form = ({ createTodo }) => {
       editing: false
     };
 
-    dispatch({ type: 'todo/add', todo: newTodo});
+    // 2023/10 修正editingがundefinedになるためediting: falseを追加
+    dispatch({ type: 'todo/add', todo: newTodo, editing: false });
 
     setEnteredTodo("");
   };

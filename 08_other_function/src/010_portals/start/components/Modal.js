@@ -2,8 +2,8 @@ import "./Modal.css";
 
 const Modal = ({ handleCloseClick }) => {
   return (
-    <div className="modal" onClick={() => console.log("真上のもう一つ上のdiv要素が反応している。")}>
-      <div className="modal__content" onClick={() => console.log("真上のdiv要素が反応している。")}>
+    <div className="modal">
+      <div className="modal__content">
         <p>モーダル</p>
         <button type="button" onClick={handleCloseClick}>
           閉じる

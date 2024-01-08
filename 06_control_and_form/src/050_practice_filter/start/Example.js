@@ -1,4 +1,3 @@
-import { useState } from "react";
 import Profile from "./components/Profile";
 
 const persons = [
@@ -20,28 +19,16 @@ const persons = [
 ];
 
 const Example = () => {
-  const [searchChar, setSearchChar] = useState("");
-  const input = (e) => { setSearchChar(e.target.value) }
   return (
     <>
-      <input type="text" onChange={input} />
+      <h3>練習問題</h3>
+      <p>入力欄を設置して、入力値と名前が一致したもののみ表示する仕組みを作成してください。</p>
       <ul>
-        {
-          persons
-            // 1行でも書けるんだが、
-            // .filter((person) => person.name.indexOf(searchChar) !== -1)
-            // あえて無名関数的に書いてみる。
-            .filter((person) => {
-              const isMatch = person.name.indexOf(searchChar) !== -1;
-              return isMatch;
-            })
-            // 無名関数の定義だから{}で囲んでる。
-            .map((person) => (
-              <li key={person.name}>
-                <Profile {...person} />
-              </li>
-            ))
-        }
+        {persons.map((person) => (
+          <li key={person.name}>
+            <Profile {...person} />
+          </li>
+        ))}
       </ul>
     </>
   );

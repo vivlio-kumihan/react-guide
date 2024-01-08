@@ -2,19 +2,24 @@ import { useState } from "react";
 import { createPortal } from "react-dom";
 import Modal from "./components/Modal";
 
-const ModalPotal = ({ children }) => {
-  const target = document.querySelector(".container.start");
-  return createPortal(children, target);
-};
+/* POINT createPortalの使い方
+第一引数: React の子要素としてレンダー可能なもの （要素、文字列、フラグメント、コンポーネントなど）
+第二引数: レンダー先のDOM要素
+*/
+
+/* POINT createPortalはどんなときに使うか？
+子要素は親要素のスタイルによって表示に制限を受ける場合があります。
+（overflow: hidden 、 z-index 、 width　など・・・ ）
+それらの制限なく、子要素が親要素を「飛び出して」表示する必要があるときにcreatePortalを使うのが有効です。
+モーダル、ポップアップ、トーストは使用の代表例です。
+*/
 
 const Example = () => {
   const [modalOpen, setModalOpen] = useState(false);
-
   return (
-    // div > button要素のクリックイベントがバグリングして親要素のdivも反応する例
-    <div onClick={() => console.log("最上位のdiv要素が反応している。")}>
-      <div className="container start" onClick={() => console.log("ModalPotalの依頼先も反応はし。")}></div>
-      {/* button要素のクリックイベントを発火させたら、上の親要素も反応する。 */}
+    <div>
+      <div className="container start"></div>
+
       <button
         type="button"
         onClick={() => setModalOpen(true)}
@@ -22,11 +27,7 @@ const Example = () => {
       >
         モーダルを表示する
       </button>
-      {modalOpen && (
-        <ModalPotal onClick={() => console.log("ModalPotalには反応しない。")}>
-          <Modal handleCloseClick={() => setModalOpen(false)} onClick={() => console.log("ModalPotalの子要素にも反応しない。")}/>
-        </ModalPotal>
-      )}
+      {modalOpen && <Modal handleCloseClick={() => setModalOpen(false)} />}
     </div>
   );
 };

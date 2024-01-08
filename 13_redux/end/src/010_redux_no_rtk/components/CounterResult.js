@@ -1,4 +1,6 @@
-import { useCounter } from "../context/CounterContext";
+// 2023/10 存在しないファイルのimportでエラーが出るため修正
+// 使用していないCounterContextのimport削除
+
 import { useSelector } from "react-redux"
 const CounterResult = () => {
   const state = useSelector(state => state);

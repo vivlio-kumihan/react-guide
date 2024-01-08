@@ -1,7 +1,6 @@
 import "./Toast.css";
 
 const Toast = ({ visible, handleCloseClick }) => {
-  // クラスの付け替えをする部分。こうやるんだ。
   const toastClassName = visible ? "toast is-visible" : "toast";
   return (
     <div className={toastClassName}>
