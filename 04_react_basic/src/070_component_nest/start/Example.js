@@ -1,9 +1,11 @@
+import Child from "./component/Child";
 import "./Example.css";
+
 
 const Example = () => {
   return (
     <div className="component">
-      <h3>Hello Component</h3>
+      <Child />
     </div>
   );
 };
