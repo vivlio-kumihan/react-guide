@@ -13,3 +13,7 @@
   border: 3px solid red;
   color: red;
 }
+.App-start .profile.green {
+  border: 3px solid green;
+  color: green;
+}

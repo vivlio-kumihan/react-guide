@@ -18,11 +18,7 @@ const Example = () => {
         num={num}
         greet={greet}
         bool
-        // obj={{myName: "takahiro", age: 58}}
         obj={obj}
-
-        // pid={otherObj.pid}
-        // price={otherObj.price}
         {...otherObj}
       />
     </>

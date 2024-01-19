@@ -1,24 +1,17 @@
 import "./Child.css";
 
-const Child = ({
-    color: df = "green",
-    num,      //=> 数値
-    greet,      //=> 関数
-    bool,     //=> 真偽値
-    obj,      //=> 数値
-    pid,      //=> 数値
-    price     //=> 数値
-  }) => {
+const Child = (props) => {
+  console.log(props);
   return (
-    <div className={`component ${df}`}>
+    <div className="component">
       <h3>Hello Component</h3>
-      <h3>{num}</h3>
-      <h3>{greet("Takahiro")}</h3>
-      <h3>{bool ? "True" : "False"}</h3>
-      <h3>{obj.myName}</h3>
-      <h3>{obj.age}</h3>
-      <h3>{pid}</h3>
-      <h3>{price}</h3>
+      <h3>{props.num}</h3>
+      <h3>{props.greet("Takahiro")}</h3>
+      <h3>{props.bool ? "True" : "False"}</h3>
+      <h3>{props.obj.myName}</h3>
+      <h3>{props.obj.age}</h3>
+      <h3>{props.pid}</h3>
+      <h3>{props.price}</h3>
     </div>
   );
 };
