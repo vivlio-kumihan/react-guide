@@ -365,7 +365,7 @@ export default Profile;
 
 ### その1
 
-* 子コンポーネントの閉じタグを入れる。
+* 子コンポーネントに閉じタグを入れる。
 * `{}`で囲んで`props`として渡す。
 
 ```js
@@ -387,7 +387,7 @@ export default Example;
 
 * 引数に変数を`childre`として入れる
 * 展開できる！
-* 
+
 ```js
 const Container = ({ title, children }) => {
   return (
@@ -404,6 +404,7 @@ export default Container;
 
 #### 親コンポーネント
 
+* __親コンポーネントで子孫の継承関係を一括で設定することができる。__
 * 子コンポーネントの`Container`へ子コンポーネントとして`Profile`を渡す。
 * 設定した属性を渡したい場合には『変数展開』を利用して渡す。
 * 細かいレイアウトはできない。
@@ -433,8 +434,7 @@ const Example = () => {
 export default Example;
 ```
 
-#### 子コンポーネント その1
-Container
+#### 子コンポーネント Container
 
 ```js
 import "./Container.css";
@@ -451,8 +451,7 @@ const Container = ({ title, children }) => {
 export default Container;
 ```
 
-#### 子コンポーネント その2
-Profile
+#### 子コンポーネント Profile
 
 ```js
 import "./Profile.css";
