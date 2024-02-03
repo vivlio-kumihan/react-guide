@@ -472,3 +472,96 @@ export default Profile;
 #### 子コンポーネント その3
 
 
+## stateについて
+
+### まずはイベントつ作ってみる
+
+ボタン属性にクリック・イベントを作って出力するコードを書く。
+アラートとコンソールで出力してみる。
+
+```js
+const Example = () => {
+  const clickHander1 = () => {
+    alert("クリックされました。");
+  };
+  const clickHander2 = () => {
+    console.log("クリックされました。");
+  };
+
+
+  return (
+    <>
+      <button onClick={clickHander1}>click</button>
+      <button onClick={clickHander2}>click</button>
+    </>
+  );
+};
+
+export default Example;
+```
+
+#### input要素と共によく使われるイベント
+* onChange
+  * 入力欄に値が入力される、または変更される毎に発火するイベント。
+* onBlur
+  * 入力欄からフォーカスが外れると発火するイベント。入力状態のinput要素からカーソルを外し外側でクリックしてフォーカスを外した瞬間に検知される。
+* onFocus
+  * 入力欄がフォーカスを得た時に発火するイベント。
+  
+```jsx
+<input
+  type="text"
+  onChange={() => console.log("onChange検知")}
+  onBlur={() => console.log("onBlur検知")}
+  onFocus={() => console.log("onFocus検知")}
+/>
+```
+
+#### 入力された値を取得する
+
+```jsx
+<label>
+  入力値を取得：
+  <input type="text" onChange={(e) => console.log(e.target.value)} />
+</label>
+```
+
+#### ホバー
+
+```jsx
+<div
+  onMouseEnter={() => console.log("カーソルが入ってきました。")}
+  onMouseLeave={() => console.log("カーソルが出ていきました。")}
+>
+  ホバーしてね！
+</div>
+```
+
+### 入力された値を別の要素に表示してみる
+
+* `input要素`に入力した値を別の要素で逐次表してみる。
+* `React`では、`useState`を分割代入にするのが流儀。
+* イベントによって発生した`e`は、`{}`の中だけに有効なローカル変数みたいなもの。だからイベントによって発生した状態を管理・運用するためには`State`が必要になる。
+* `input要素`の値を変更する毎に`onChange`の`handleChange関数`が実行される。
+* `handleChange関数`の中身は、`setValue関数`を呼ぶこと。つまりその度にExampleコンポーネントは`再レンダリング`される === 表示される値が`更新されていく`という寸法。
+```jsx
+import { useState } from "react";
+
+const Example = () => {
+  const [value, setValue] = useState("");
+  const handleChange = (e) => {
+    setValue(e.target.value);
+  };
+
+  return (
+    <>
+      <input  
+        type="text"
+        onChange={handleChange}
+      />
+      <span> = {value}</span>
+    </>
+  );
+};
+export default Example;
+```
