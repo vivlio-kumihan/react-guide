@@ -10,7 +10,7 @@ const Example = () => {
   return (
     <div>
       {/* その1 */}
-      <Container title="childrenで渡す">
+      <Container title="childrenで渡す this">
         {/* childrenで子孫関係を構成して、propを受け渡す。 */}
         {/* オブジェクトの分割代入でpropsを子コンポーネントへ送る。 */}
         <Profile {...profile[0]} />
@@ -33,10 +33,14 @@ const Example = () => {
       {/* その3 */}
       <Container title="個別に渡せる"
         // 任意の属性を作って個別に渡すことができる。
+        // children={[
+        //     <Profile  {...profile[0]} />,
+        //     <Profile  {...profile[1]} />
+        //   ]}
         // いきなりこの記述を見ても理解できない。
         // こう言う渡し方はchildrenでpropsを渡していく根本からの流れを理解しないといけない。
-        first={<Profile key={profile[0].name} {...profile[0]} />}
-        second={<Profile key={profile[1].name} {...profile[1]} />}
+        first={<Profile  {...profile[0]} />}
+        second={<Profile  {...profile[1]} />}
       />
     </div>
   );
