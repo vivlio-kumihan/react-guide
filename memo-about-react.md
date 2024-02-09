@@ -361,12 +361,15 @@ export default Profile;
 
 ## propsのchildren
 
-親コンポーネント
+親コンポーネントから子コンポーネントへ`値`を渡す方法の一つ。
 
 ### その1
 
-* 子コンポーネントに閉じタグを入れる。
-* `{}`で囲んで`props`として渡す。
+* JSXの中に`閉じタグ`を付けて子コンポーネントを記述する。
+* その中へ値を`{}`で囲んで`props`として渡す。
+* 子コンポーネントではそれを`chirdren`として受け取り、JSX内で展開する。
+
+子コンポーネント`Continer`に閉じタグを付ける。『hello』という文字列を`{}`で囲みpropsで渡す。
 
 ```js
 import Container from "./components/Container";
@@ -405,9 +408,10 @@ export default Container;
 #### 親コンポーネント
 
 * __親コンポーネントで子孫の継承関係を一括で設定することができる。__
-* 子コンポーネントの`Container`へ子コンポーネントとして`Profile`を渡す。
-* 設定した属性を渡したい場合には『変数展開』を利用して渡す。
-* 細かいレイアウトはできない。
+* 子コンポーネントの`Container`へ孫コンポーネントとして`Profile`を渡す。
+* 親コンポーネントで設定した『`値`（例えば商品リストなど）』===『`配列`の値』を渡したい場合には`変数展開`を利用する。
+* これ重要。商品リストなどの情報はできるだけ上流で格納しないといけない。
+* 親コンポーネントから孫コンポーネントへprops経由で情報を渡せている。`商品リストなどの情報`をプログラムで`やりとりする際のヒント`がここにある。
   
 ```js
 import Profile from "./components/Profile";
@@ -422,7 +426,6 @@ const Example = () => {
   return (
     <div>
       <Container title="Childrenを使ってみる">
-        <Profile />
         {/* 設定した属性を渡したい場合には『変数展開』を利用して渡す */}
         <Profile {...profile[0]} />
         <Profile {...profile[1]} />
@@ -435,6 +438,12 @@ export default Example;
 ```
 
 #### 子コンポーネント Container
+
+ここでは`レイアウト`をしているだけと言いつつ細かい指定はできない。
+親コンポーネントで仕込んだ孫コンポーネントがまとめてやってくるのを`children`で一括して受け取る。
+
+このコードを見るだけでは何が渡ってきているのかはわからない。
+このコンポーネントはレイアウト専従として親コンポーネントで設計されている。
 
 ```js
 import "./Container.css";
@@ -451,8 +460,10 @@ const Container = ({ title, children }) => {
 export default Container;
 ```
 
-#### 子コンポーネント Profile
+#### 孫コンポーネント
 
+渡ってきた`propsを展開`させるための`型`または`部品`
+propsで渡ってきた値は、このフォーマットに従ってが展開される。
 ```js
 import "./Profile.css";
 
@@ -469,8 +480,86 @@ const Profile = ({ name, age, country, color }) => {
 export default Profile;
 ```
 
-#### 子コンポーネント その3
+### その3　childrenからの発展
 
+#### コンポーネントを配列で渡す
+
+コンポーネントも`オブジェクト`なので、孫コンポーネントをpropsの配列として渡すことができることを確認する。
+
+`children属性（props）`にコンポーネントを配列に格納して渡す。
+なお、配列で渡す場合は、それぞれの値に対して`key`が必要。
+
+```jsx
+import Profile from "./components/Profile";
+import Container from "./components/Container";
+
+const profile = [
+  { name: "Takashi", age: 19, country: "Japan" },
+  { name: "Jane", age: 28, country: "UK", color: "red" },
+];
+
+const Example = () => {
+  return (
+    <div>
+      <Container title="属性の値（配列）として渡す"
+        children={
+          [
+            <Profile key={profile[0].name} {...profile[0]} />,
+            <Profile key={profile[1].name} {...profile[1]} />
+          ]
+        }
+      />
+    </div>
+  );
+};
+
+export default Example;
+```
+
+#### コンポーネントを個別に渡す
+
+任意の属性を作って個別に渡すことができる。
+
+```jsx
+import Profile from "./components/Profile";
+import Container from "./components/Container";
+
+const profile = [
+  { name: "Takashi", age: 19, country: "Japan" },
+  { name: "Jane", age: 28, country: "UK", color: "red" },
+];
+
+const Example = () => {
+  return (
+    <div>
+      <Container title="個別に渡せる"
+        first={<Profile {...profile[0]} />}
+        second={<Profile {...profile[1]} />}
+      />
+    </div>
+  );
+};
+
+export default Example;
+```
+
+親コンポーネントで設計図書いて、子コンポーネントでレイアウトする。
+
+```jsx
+import "./Container.css";
+
+const Container = ({ title, first, second }) => {
+  return (
+    <div className="container">
+      <h3>{title}</h3>
+      <div>{second}</div>
+      <div>{first}</div>
+    </div>
+  );
+};
+
+export default Container;
+```
 
 ## stateについて
 
