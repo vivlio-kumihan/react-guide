@@ -2,27 +2,74 @@ import { useState } from "react";
 import Counter from "./components/Counter";
 
 const Example = () => {
-  const [countA, setCountA] = useState(0);
-  const [countB, setCountB] = useState(0);
-
   const [toggle, setToggle] = useState(true);
-  const toggleHander = () => {
+  const toggleHandler = () => {
     setToggle((prevState) => !prevState);
   };
 
-
   return (
     <>
-    <button onClick={toggleHander}>SWICH</button>
-    {toggle 
-      ? <Counter whichCounter="A" count={countA} setCount={setCountA} />
-      : <Counter whichCounter="B" count={countB} setCount={setCountB} />
-    }
+      <button onClick={toggleHandler}>Button Switch</button>
+      {console.log(toggle)}
+      {
+        toggle 
+          ? <Counter title="A" key="A" />
+          : <Counter title="B" key="B" />
+      }
     </>
   );
 };
 
 export default Example;
+
+// import { useState } from "react";
+// import Counter from "./components/Counter"
+
+// // POINT stateとコンポーネントの関係
+// const Example = () => {
+//   const [toggle, setToggle] = useState(true);
+//   const toggleHandler = () => {
+//     setToggle(prev => !prev);
+//   }
+
+//   return (
+//     <>
+//       <button onClick={toggleHandler}>Switch Button</button>
+//       {toggle 
+//         ? <Counter key="A" title="A" /> 
+//         : <Counter key="B" title="B" />
+//       }
+//     </>
+//   )
+// }
+
+// export default Example;
+
+// import { useState } from "react";
+// import Counter from "./components/Counter";
+
+// const Example = () => {
+//   const [countA, setCountA] = useState(0);
+//   const [countB, setCountB] = useState(0);
+
+//   const [toggle, setToggle] = useState(true);
+//   const toggleHander = () => {
+//     setToggle((prevState) => !prevState);
+//   };
+
+
+//   return (
+//     <>
+//     <button onClick={toggleHander}>SWICH</button>
+//     {toggle 
+//       ? <Counter whichCounter="A" count={countA} setCount={setCountA} />
+//       : <Counter whichCounter="B" count={countB} setCount={setCountB} />
+//     }
+//     </>
+//   );
+// };
+
+// export default Example;
 
 
 // key="A" 
