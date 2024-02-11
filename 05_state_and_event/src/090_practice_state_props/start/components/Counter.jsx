@@ -1,21 +1,21 @@
-import { useState } from 'react';
+// import { useState } from 'react';
 
-const Counter = ({ title }) => {
-  const [count, setCount] = useState(0);
+// const Counter = ({ title }) => {
+//   const [count, setCount] = useState(0);
   
-  const pulusCountHandler = () => { setCount(() => count + 1) };
-  const minusCountHandler = () => { setCount(() => count - 1) };
+//   const pulusCountHandler = () => { setCount(() => count + 1) };
+//   const minusCountHandler = () => { setCount(() => count - 1) };
 
-  return (
-    <>
-      <h3>カウント{title}: {count}</h3>
-      <button onClick={pulusCountHandler}>+</button>
-      <button onClick={minusCountHandler}>-</button>      
-    </>
-  );
-};
+//   return (
+//     <>
+//       <h3>カウント{title}: {count}</h3>
+//       <button onClick={pulusCountHandler}>+</button>
+//       <button onClick={minusCountHandler}>-</button>      
+//     </>
+//   );
+// };
 
-export default Counter;
+// export default Counter;
 
 // import { useState } from "react";
 
