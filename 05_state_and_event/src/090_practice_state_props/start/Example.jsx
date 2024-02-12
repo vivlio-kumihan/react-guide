@@ -1,30 +1,49 @@
-// クリックイベントの考え方　その1
-// setCount(() => count + 1);
-// なぜ『count + 1』を{}では括らないのか？
-// 現状の答えは、戻り値はオブジェクトではなく数値を期待しているから。
-// 計算が複数行になる場合は、『（）カッコ』で括る。
-
-import { useState } from "react";
+// クリックイベントの考え方　その2
+// カウンター部分をコンポーネントで管理する。
+// ここではレイアウトをしているだけ。
+// 状態・JSXとも子コンポーネントへ移す。
+import Counter from "./components/Counter";
 
 const Example = () => {
-  const [count, setCount] = useState(0);
-  const plusHandler = () => {
-    setCount(() => count + 1);
-  }
-  const minusHandler = () => {
-    setCount(() => count - 1);
-  }
 
   return (
     <>
-      <h3>カウント数: {count}</h3>
-      <button onClick={plusHandler}>+</button>
-      <button onClick={minusHandler}>-</button>
+      <Counter title="A" />
+      <Counter title="B" />
     </>
   );
 };
 
 export default Example;
+
+
+// // クリックイベントの考え方　その1
+// // setCount(() => count + 1);
+// // なぜ『count + 1』を{}では括らないのか？
+// // 現状の答えは、戻り値はオブジェクトではなく数値を期待しているから。
+// // 計算が複数行になる場合は、『（）カッコ』で括る。
+
+// import { useState } from "react";
+
+// const Example = () => {
+//   const [count, setCount] = useState(0);
+//   const plusHandler = () => {
+//     setCount(() => count + 1);
+//   }
+//   const minusHandler = () => {
+//     setCount(() => count - 1);
+//   }
+
+//   return (
+//     <>
+//       <h3>カウント数: {count}</h3>
+//       <button onClick={plusHandler}>+</button>
+//       <button onClick={minusHandler}>-</button>
+//     </>
+//   );
+// };
+
+// export default Example;
 // import { useState } from "react";
 // import Counter from "./components/Counter";
 
