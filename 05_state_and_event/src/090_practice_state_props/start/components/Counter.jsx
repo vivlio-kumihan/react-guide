@@ -1,4 +1,4 @@
-// クリックイベントの考え方　その2
+// クリックイベントの考え方　その3
 import { useState } from "react";
 
 const Counter = ({ title }) => {

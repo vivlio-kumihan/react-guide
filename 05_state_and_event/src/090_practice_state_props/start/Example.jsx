@@ -1,15 +1,26 @@
-// クリックイベントの考え方　その2
-// カウンター部分をコンポーネントで管理する。
-// ここではレイアウトをしているだけ。
-// 状態・JSXとも子コンポーネントへ移す。
+// クリックイベントの考え方　その3
+// ボタンとカウンターを切り替える装置を付与する。
+// 装置を付与すると、先のコードで実現できていたstateの個別維持ができなくなる。
+// 回避方法の一つとして、コンポーネントにkey属性をつける。
+// ただ、これをすると切り替えるタイミングで値が初期化されてしまう。
+
+import { useState } from "react";
 import Counter from "./components/Counter";
 
 const Example = () => {
+  const [toggle, setToggle] = useState(true);
+  const toggleHandler = () => {
+    setToggle(((prevState) => !prevState));
+  };
 
   return (
     <>
-      <Counter title="A" />
-      <Counter title="B" />
+      <button onClick={toggleHandler}>Switch Button</button>
+      {
+        toggle
+          ? <Counter key="A" title="A" />
+          : <Counter key="B" title="B" />
+      }
     </>
   );
 };
