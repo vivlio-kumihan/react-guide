@@ -1,13 +1,21 @@
-// クリックイベントの考え方　その3
-// ボタンとカウンターを切り替える装置を付与する。
-// 装置を付与すると、先のコードで実現できていたstateの個別維持ができなくなる。
-// 回避方法の一つとして、コンポーネントにkey属性をつける。
-// ただ、これをすると切り替えるタイミングで値が初期化されてしまう。
+// クリックイベントの考え方　その4
+// 子コンポーネントで生成していたstateを親コンポーネントへ移動させる。
+// stateの個別の維持はできないのでkeyは捨てる。
+// 結論としてはstateを仕分ける。
+
+// 新しい視点を得ること。
+// 入力は別々だけど、フォーマットである子コンポーネントへ送る属性名は同じ。
+// countA、countBと値は別々だけど、属性名はcountとして同名で送っている。
+// 子コンポーネントへの『送信は別々』、フォーマット『『一つ』という視点で
+// コードを見る、考えること。
 
 import { useState } from "react";
 import Counter from "./components/Counter";
 
 const Example = () => {
+  const [countA, setCountA] = useState(0);
+  const [countB, setCountB] = useState(0);
+  
   const [toggle, setToggle] = useState(true);
   const toggleHandler = () => {
     setToggle(((prevState) => !prevState));
@@ -18,14 +26,43 @@ const Example = () => {
       <button onClick={toggleHandler}>Switch Button</button>
       {
         toggle
-          ? <Counter key="A" title="A" />
-          : <Counter key="B" title="B" />
+          ? <Counter title="A" count={countA} setCount={setCountA} />
+          : <Counter title="B" count={countB} setCount={setCountB} />
       }
     </>
   );
 };
 
 export default Example;
+
+// // クリックイベントの考え方　その3
+// // ボタンとカウンターを切り替える装置を付与する。
+// // 装置を付与すると、先のコードで実現できていたstateの個別維持ができなくなる。
+// // 回避方法の一つとして、コンポーネントにkey属性をつける。
+// // ただ、これをすると切り替えるタイミングで値が初期化されてしまう。
+
+// import { useState } from "react";
+// import Counter from "./components/Counter";
+
+// const Example = () => {
+//   const [toggle, setToggle] = useState(true);
+//   const toggleHandler = () => {
+//     setToggle(((prevState) => !prevState));
+//   };
+
+//   return (
+//     <>
+//       <button onClick={toggleHandler}>Switch Button</button>
+//       {
+//         toggle
+//           ? <Counter key="A" title="A" />
+//           : <Counter key="B" title="B" />
+//       }
+//     </>
+//   );
+// };
+
+// export default Example;
 
 
 // // クリックイベントの考え方　その1
