@@ -11,6 +11,7 @@
 
 import { useState } from "react";
 import Counter from "./components/Counter";
+import "./sass/Example.sass";
 
 const Example = () => {
   const [countA, setCountA] = useState(0);
@@ -35,63 +36,12 @@ const Example = () => {
 
 export default Example;
 
-// // クリックイベントの考え方　その3
-// // ボタンとカウンターを切り替える装置を付与する。
-// // 装置を付与すると、先のコードで実現できていたstateの個別維持ができなくなる。
-// // 回避方法の一つとして、コンポーネントにkey属性をつける。
-// // ただ、これをすると切り替えるタイミングで値が初期化されてしまう。
-
-// import { useState } from "react";
-// import Counter from "./components/Counter";
-
-// const Example = () => {
-//   const [toggle, setToggle] = useState(true);
-//   const toggleHandler = () => {
-//     setToggle(((prevState) => !prevState));
-//   };
-
-//   return (
-//     <>
-//       <button onClick={toggleHandler}>Switch Button</button>
-//       {
-//         toggle
-//           ? <Counter key="A" title="A" />
-//           : <Counter key="B" title="B" />
-//       }
-//     </>
-//   );
-// };
-
-// export default Example;
 
 
-// // クリックイベントの考え方　その1
-// // setCount(() => count + 1);
-// // なぜ『count + 1』を{}では括らないのか？
-// // 現状の答えは、戻り値はオブジェクトではなく数値を期待しているから。
-// // 計算が複数行になる場合は、『（）カッコ』で括る。
 
-// import { useState } from "react";
 
-// const Example = () => {
-//   const [count, setCount] = useState(0);
-//   const plusHandler = () => {
-//     setCount(() => count + 1);
-//   }
-//   const minusHandler = () => {
-//     setCount(() => count - 1);
-//   }
 
-//   return (
-//     <>
-//       <h3>カウント数: {count}</h3>
-//       <button onClick={plusHandler}>+</button>
-//       <button onClick={minusHandler}>-</button>
-//     </>
-//   );
-// };
 
-// export default Example;
 // import { useState } from "react";
 // import Counter from "./components/Counter";
 
@@ -107,6 +57,30 @@ export default Example;
 //       {console.log(toggle)}
 //       {
 //         toggle 
+//           ? <Counter title="A" key="A" />
+//           : <Counter title="B" key="B" />
+//       }
+//     </>
+//   );
+// };
+
+// export default Example;
+
+
+// import { useState } from "react";
+// import Counter from "./components/Counter";
+
+// const Example = () => {
+//   const [toggle, setToggle] = useState(true);
+//   const toggleHandler = () => {
+//     setToggle((prevState) => !prevState);
+//   };
+
+//   return (
+//     <>
+//       <button onClick={toggleHandler}>Switch</button>
+//       {
+//         toggle
 //           ? <Counter title="A" key="A" />
 //           : <Counter title="B" key="B" />
 //       }

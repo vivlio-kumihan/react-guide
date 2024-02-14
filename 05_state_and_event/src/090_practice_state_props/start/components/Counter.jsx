@@ -43,6 +43,27 @@ export default Counter;
 
 // export default Counter;
 
+// import { useState } from "react";
+
+// const Counter = ({ title }) => {
+//   const [count, setCount] = useState(0);
+//   const plusHandler = () => {
+//     setCount(() => count + 1);
+//   }
+//   const minusHandler = () => {
+//     setCount(() => count - 1);
+//   }
+//   return (
+//     <>
+//       <h3>カウント{title}: {count}</h3>
+//       <button onClick={plusHandler}>+</button>
+//       <button onClick={minusHandler}>-</button>    
+//     </>
+//   );
+// };
+
+// export default Counter;
+
 // import { useState } from 'react';
 
 // const Counter = ({ title }) => {
