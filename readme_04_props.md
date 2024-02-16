@@ -103,9 +103,13 @@ export default Expression;
 #### クラスを追加する
 
 * 子コンポーネントの文字色・枠線を変更する。
-* 子コンポーネントはフォーマットであることを留意する。
-* JSXの中で展開、JSの変数を展開。この二つをしっかりと意識できるか。
+
+#### 留意点
+
+* 子コンポーネントはフォーマットであることを意識した書き方をする。
+* JSXの中で`{}`で囲んで`式`にして、`${}`で変数展開。この二つをしっかりと意識できるか。
 * 子コンポーネントへのpropsの渡し方に注目。
+* `props`は慣習的な書き方。別になんでもいい。定数・キーワードなどの類ではない。 
 
 ```jsx
 import Child from "./components/Child";
@@ -134,13 +138,67 @@ const Child = (props) => {
 export default Child;
 ```
 
+#### 留意点
+
+* `props`は`object`。その代わり`{}リテラル`で囲って属性名を入れる。この例では`{ color }`。`JSX内`で展開すると値を得ることができる。
+
+```jsx
+const Child = ({ color }) => {
+  return (
+    <>
+      <div className={`component ${color}`} >
+        <h3>Hello Component</h3>
+      </div>
+    </>
+  );
+};
+
+export default Child;
+```
+
+#### 留意点
 
 * 属性の`初期値`を設定することができる。
-* `const Child = (props) => {...};`として親コンポーネントで設定した`属性とその値`を`スプレッド演算子`を使ってまとめて`引き取る`ことができる。
-* 子コンポーネントでは、propsを`分割代入`で受け取ることができる。
+
+```jsx
+const Child = ({ color = "green" }) => {
+  return (
+    <>
+      <div className={`component ${color}`} >
+        <h3>Hello Component</h3>
+      </div>
+    </>
+  );
+};
+
+export default Child;
+```
+
+#### 留意点
+
 * 属性は`別名`を作ることができる。
-* 分割代入 その1　残りを全部`{...propsName}`
-親コンポーネント
+
+```jsx
+const Child = ({ color: c = "green" }) => {
+  return (
+    <>
+      <div className={`component ${c}`} >
+        <h3>Hello Component</h3>
+      </div>
+    </>
+  );
+};
+
+export default Child;
+```
+
+#### 留意点
+
+* 子コンポーネントでは、propsを`分割代入`で受け取ることができる。
+  * 分割代入 その1　残りを全部`{...propsName}`
+  
+__親コンポーネント__
+
 ```js
 import Child from "./components/Child";
 
@@ -156,16 +214,15 @@ const Example = () => {
 export default Example;
 ```
 
-子コンポーネント
-```js
-import "./Child.css";
+__子コンポーネント__
 
-const Child = ({ color: df = "green", second, third, ...rest }) => {
+```js
+const Child = ({ color: c = "green", second, third, ...rest }) => {
   console.log(second);
   console.log(third);
   console.log(rest);
   return (
-    <div className={`component ${df}`}>
+    <div className={`component ${c}`}>
       <h3>Hello Component</h3>
     </div>
   );
@@ -176,8 +233,12 @@ export default Child;
 
 ## 例　その2
 
-色々なデータをpropsに渡して送る・受け取る。
-`スプレッド演算子`を使って`属性をまとめて`送っている。
+### 色々なデータをpropsに渡して送る・受け取る。
+
+* 親コンポーネントで`真偽値bool`が定義されていない場合はデフォルト値を設定すると良い。出なければ`undefined`が返ってくるから。
+* 関数に引数であるオブジェクトを渡すときに`...オブジェクト名`とするとそのオブジェクトを展開するということができる。その機能をコンポーネントでのpropsのやり取りに利用したもの。`...`は`スプレッド演算子`という。
+
+__親コンポーネント__
 
 ``` js
 import Child from "./components/Child";
@@ -227,6 +288,7 @@ const Example = () => {
 
 export default Example;
 ```
+__子コンポーネント__
 
 ```js
 import "./Child.css";
@@ -235,7 +297,7 @@ const Child = ({
     color: df = "green",
     num,   //=> 数値
     greet, //=> 関数
-    bool,  //=> 真偽値
+    bool = false,  //=> 真偽値
     obj,   //=> 数値
     pid,   //=> 数値
     price  //=> 数値
