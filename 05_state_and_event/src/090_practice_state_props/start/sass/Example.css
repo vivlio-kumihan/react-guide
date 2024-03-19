@@ -1,0 +1,12 @@
+details + details {
+  margin-top: 5px;
+}
+details summary, details p {
+  width: 100%;
+  padding: 10px;
+  color: #fff;
+  cursor: pointer;
+}
+details summary {
+  background-color: blue;
+}/*# sourceMappingURL=Example.css.map */
