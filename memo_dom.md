@@ -87,3 +87,28 @@ console.dir(point.nextElementSibling.textContent);
 |S1 > S2||属性名の属性値に部分一致|セレクター1に含まれる全てのセレクター2に一致
 |S1 + S2||セレクター1の直後のセレクター2に一致|
 |S1 ~ S2||セレクター1の兄弟要素でセレクター1よりも後方にあるセレクター2に一致|
+
+# 14.1.5 先祖要素に遡って検索する
+
+## closetメソッド
+
+親とその先祖を遡って最初に一致する要素を取得する。
+
+```html
+  <dl class="this_closet">
+    <div class="one">
+      この前に挿入されるはず。
+      <dt class="this">hello</dt>
+      <dd>bye</dd>
+    </div>
+    <div class="two">
+      <dt class="that">nob</dt>
+      <dd>kaz</dd>
+    </div>
+  </dl>
+```
+```js
+const ti = document.querySelector(".this");
+const div = ti.closest("div");
+div.prepend("発見 =>");
+```

@@ -11,12 +11,32 @@
 </head>
 
 <body>
-  <div class="container">
-    <!-- コメント -->
+  <section style="background-color: yellow;">
+    これは先祖要素です。
+    <div>
+      <span id="target"></span>
+    </div>
+  </section>
+  <section>
+    これは先祖要素ではない。
+  </section>
+
+  <dl class="this_closet">
+    <div class="one">
+      この前に挿入されるはず。
+      <dt class="this">hello</dt>
+      <dd>bye</dd>
+    </div>
+    <div class="two">
+      <dt class="that">nob</dt>
+      <dd>kaz</dd>
+    </div>
+  </dl>
+  <!-- <div class="container">
     <h1>before heading</h1>
     <p class="point">this is point pragraph</p>
     <p>this is after pragraph</p>
-  </div>
+  </div> -->
 </body>
 
 </html>

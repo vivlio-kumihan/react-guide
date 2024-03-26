@@ -33,16 +33,24 @@
 // console.dir(target[0]); //=> h1
 // console.dir(target[0].textContent); //=> heading1
 
-const target = document.querySelector(".container");
-console.dir(target.children);
-//=> HTMLCollection(3)
-console.dir(target.firstElementChild);
-//=> h1
-console.dir(target.lastElementChild);
-//=> p
+// const target = document.querySelector(".container");
+// console.dir(target.children);
+// //=> HTMLCollection(3)
+// console.dir(target.firstElementChild);
+// //=> h1
+// console.dir(target.lastElementChild);
+// //=> p
 
-const point = document.querySelector(".point");
-console.dir(point.previousElementSibling.textContent);
-//=> before heading
-console.dir(point.nextElementSibling.textContent);
-//=> this is after pragraph
+// const point = document.querySelector(".point");
+// console.dir(point.previousElementSibling.textContent);
+// //=> before heading
+// console.dir(point.nextElementSibling.textContent);
+// //=> this is after pragraph
+
+const ti = document.querySelector(".this");
+const div = ti.closest("div");
+div.prepend("発見 =>");
+
+const target = document.querySelector("#target");
+const section = target.closest("section");
+section.prepend("発見 =>");
