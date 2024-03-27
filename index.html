@@ -11,32 +11,21 @@
 </head>
 
 <body>
-  <section style="background-color: yellow;">
-    これは先祖要素です。
-    <div>
-      <span id="target"></span>
-    </div>
-  </section>
-  <section>
-    これは先祖要素ではない。
-  </section>
-
-  <dl class="this_closet">
-    <div class="one">
-      この前に挿入されるはず。
-      <dt class="this">hello</dt>
-      <dd>bye</dd>
-    </div>
-    <div class="two">
-      <dt class="that">nob</dt>
-      <dd>kaz</dd>
-    </div>
-  </dl>
-  <!-- <div class="container">
-    <h1>before heading</h1>
-    <p class="point">this is point pragraph</p>
-    <p>this is after pragraph</p>
-  </div> -->
+  <div class="container">
+    <h1>見出し</h1>
+    <ul id="hello">
+      <li>bye</li>
+      <li>こんにちは</li>
+      <li>hello</li>
+    </ul>
+    <P id="idAttr" class="classAttr">
+      <span>hello</span>
+      これは段落です。<span>スパンに囲まれています。</span>
+    </P>
+    <p class="classAttr">これは段落です。</p>
+    <input type="text" name="nameAttr" />
+    <input type="password" name="pwdAttr" />
+  </div>
 </body>
 
 </html>

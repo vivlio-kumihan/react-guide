@@ -112,3 +112,54 @@ const ti = document.querySelector(".this");
 const div = ti.closest("div");
 div.prepend("発見 =>");
 ```
+
+## 練習）
+
+```html
+  <div class="container">
+    <h1>見出し</h1>
+    <P id="idAttr" class="classAttr">
+      これは段落です。<span>スパンに囲まれています。</span>
+    </P>
+    <p class="classAttr">これは段落です。</p>
+    <input type="text" name="nameAttr" />
+    <input type="password" name="pwdAttr" />
+  </div>
+```
+
+### 解答 6 h1タグの兄弟要素でtype属性がpasswordの要素 
+
+`兄弟要素`の中から`どれか`の時は、`~`をイメージできないとね。
+
+```js
+// 周りくどい回答
+// const headOne = document.querySelector("h1");
+// const pwd = headOne.parentElement.querySelector('[type="password"]');
+// console.log(pwd);
+document.querySelector("h1 ~ input[type='password']");
+```
+
+### 解答 7 id属性がidAttrの要素の子要素 
+
+hogehoge要素の子要素 => 最初の子要素の時は、`> *`をイメージできないとね。
+
+```js
+// 惜しいけど。。。
+// const idAttr = document.getElementById("idAttr");
+// console.log(idAttr.firstElementChild);
+document.querySelector("#idAttr > *");
+// または 
+document.querySelector("#idAttr").firstElementChild;
+```
+
+### 解答 8 inputタグのtype属性がtextの直後の要素
+
+hogehoge要素の直後の時は、`+ *`をイメージできないとね。
+
+```js
+// const text = document.querySelector('[type="text"]');
+// console.log(text.nextElementSibling);
+document.querySelector("input[type='text'] + *");
+// または 
+document.querySelector("input[type='text']").nextElementSibling;
+```

@@ -1,56 +1,42 @@
-// const target = document.querySelectorAll("div > h1");
-// const target = document.querySelector("div + h1");
-// const target = document.querySelector("div ~ h1");
+// const idAttr = document.getElementById("idAttr");
+// console.dir(idAttr);
 
-// // オブジェクト形式でコンソールにDOMオブジェクト（Element, Node）の中身を表示できる。
+// const clsAttrs = document.querySelectorAll(".classAttr");
+// for (const elem of clsAttrs) {
+//   console.log(elem);
+// }
 
-// // ドキュメントを探ってみる。
+// const p = document.querySelectorAll("p");
+// for (const elem of p) {
+//   console.log(elem);
+// }
 
-// // const html = document.querySelector("html");
-// console.dir(document.children);
-// // HTMLCollection(1)
-// //   0: html
-// //   length: 1
-// console.dir(document.children[0].children);
-// // HTMLCollection(2)
-// //   0: head
-// //   1: body
-// //   length: 2
+// const elemText = document.querySelector('[type="text"]');
+// console.log(elemText);
 
-// console.dir(document.childNodes);
-// // NodeList(2)
-// //   0: <!DOCTYPE html>
-// //   1: html
-// //   length: 2
+// const span = document.querySelector("span");
+// console.log(span.closest("p"));
 
-// // エレメントを探ってみる。
+// const container = document.querySelector(".container");
+// console.log(container.lastElementChild);
 
-// const target = document.querySelectorAll("h1");
-// console.dir(target);
-// // NodeList(1)
-// //  0: h1
-// //  length: 1
-// console.dir(target[0]); //=> h1
-// console.dir(target[0].textContent); //=> heading1
+// 解答 6 h1タグの兄弟要素でtype属性がpasswordの要素 
+// const headOne = document.querySelector("h1");
+// const pwd = headOne.parentElement.querySelector('[type="password"]');
+// console.log(pwd);
+// document.querySelector("h1 ~ input[type='password']");
 
-// const target = document.querySelector(".container");
-// console.dir(target.children);
-// //=> HTMLCollection(3)
-// console.dir(target.firstElementChild);
-// //=> h1
-// console.dir(target.lastElementChild);
-// //=> p
+// 解答 7 id属性がidAttrの要素の子要素 
+// const idAttr = document.getElementById("idAttr");
+// console.log(idAttr.firstElementChild);
+// const child = document.querySelector("#idAttr > *");
+// または 
+// const child = document.querySelector("#idAttr").firstElementChild;
+// console.log(child);
 
-// const point = document.querySelector(".point");
-// console.dir(point.previousElementSibling.textContent);
-// //=> before heading
-// console.dir(point.nextElementSibling.textContent);
-// //=> this is after pragraph
-
-const ti = document.querySelector(".this");
-const div = ti.closest("div");
-div.prepend("発見 =>");
-
-const target = document.querySelector("#target");
-const section = target.closest("section");
-section.prepend("発見 =>");
+// // 解答 8 inputタグのtype属性がtextの直後の要素
+// // const text = document.querySelector('[type="text"]');
+// // console.log(text.nextElementSibling);
+// document.querySelector("input[type='text'] + *");
+// // または 
+// document.querySelector("input[type='text']").nextElementSibling;
