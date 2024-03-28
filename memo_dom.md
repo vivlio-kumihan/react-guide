@@ -163,3 +163,20 @@ document.querySelector("input[type='text'] + *");
 // または 
 document.querySelector("input[type='text']").nextElementSibling;
 ```
+
+## 練習）
+
+ブラウザにどのように出力されるかイメージできるようにね。
+
+```html
+    <p id="textContent"></p>
+    <p id="innerHTML"></p>
+```
+
+```js
+const tc = document.querySelector("#textContent");
+const ih = document.querySelector("#innerHTML");
+
+tc.textContent = "<strong>textContentとinnerHTML</strong>";
+ih.innerHTML = "<strong>textContentとinnerHTML</strong>";
+```
