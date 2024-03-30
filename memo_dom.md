@@ -180,3 +180,106 @@ const ih = document.querySelector("#innerHTML");
 tc.textContent = "<strong>textContentとinnerHTML</strong>";
 ih.innerHTML = "<strong>textContentとinnerHTML</strong>";
 ```
+
+## 練習）
+
+2秒毎に以下のように要素を移動する。
+
+1. h1タグ内のspanタグの前に移動
+1. h1タグの直後に移動
+1. wrapタグの子要素の末尾に移動
+1. liタグの2番目の文字の前に移動
+
+```html
+  <div class="container">
+    <div id="source">Source</div>
+    <section id="section">
+      <div class="wrap">
+        <h1 class="title">
+          <span>タイトル</span>
+        </h1>
+        <ul class="list">
+          <li>1</li>
+          <li>2</li>
+          <li>3</li>
+        </ul>
+      </div>
+    </section>
+  </div>
+```
+
+__間違っている考え方。__
+__非同期関数の実行中に関数を作動させようとしていたこと。__
+
+```js
+const source = document.querySelector("#source");
+const headOne = document.querySelector("h1");
+const wrap = document.querySelector(".wrap");
+const list = document.querySelector("li:nth-of-type(2)")
+
+const execute = (source) => {
+  return new Promise((resolve) => {
+    console.log("hello");
+    resolve(source);
+  }, 2000);
+};
+
+execute(source)
+  .then(elem => {
+    console.log(headOne);
+    headOne.prepend(elem);
+  })
+  .then(elem => {
+    console.log(headOne);
+    headOne.after(elem);
+  })
+  .then(elem => {
+    console.log(wrap);
+    wrap.append(elem);
+  })
+  .then(elem => {
+    console.log(list);
+    list.insertAdjacentElement("afterbegin", elem);
+  });
+```
+
+__方針は、__
+__大元でコールバック関数を実行させて引数無しでresolve()関数を呼ぶ。__
+
+```js
+const moveElem = (callback) => {
+  return () => new Promise((resolve) => {
+      setTimeout(() => {
+        callback();
+        resolve();
+      }, 2000);
+    });
+}
+
+const source = document.querySelector("#source");
+
+const ans1 = moveElem(() => {
+  const headOne = document.querySelector("h1");
+  headOne.prepend(source);
+});
+
+const ans2 = moveElem(() => {
+  const headOne = document.querySelector("h1");
+  headOne.after(source);
+});
+
+const ans3 = moveElem(() => {
+  const wrap = document.querySelector(".wrap");
+  wrap.append(source);
+});
+
+const ans4 = moveElem(() => {
+  const list = document.querySelector("li:nth-of-type(2)")
+  list.insertAdjacentElement("afterbegin", source);
+});
+
+ans1()
+  .then(ans2)
+  .then(ans3)
+  .then(ans4)
+```
