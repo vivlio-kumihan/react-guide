@@ -283,3 +283,41 @@ ans1()
   .then(ans3)
   .then(ans4)
 ```
+
+# 画面の取得・更新
+
+## 14.2.1 要素内のコンテンツの取得・更新
+
+### innerHTMlとtextContent
+
+こういうHTMLがあり、
+
+```html
+<p id="text-content"></p>
+<p id="inner-html"></p>
+<p id="get-inline">
+  hello, textContent and <strong>innerHTML</strong>
+</p>
+```
+
+以下のようなJSの時に、結果を想像できるようにしておいて。
+
+```js
+const tc = document.getElementById("text-content");
+const ih = document.getElementById("inner-html");
+
+const str = "<strong>textContentとinnerHTML</strong>";
+tc.textContent = str;
+ih.innerHTML = str;
+```
+
+```js
+const ws = document.getElementById("get-inline");
+
+console.log(ws.textContent);
+//=> hello, textContent and innerHTML 
+console.log(ws.innerHTML);
+//=> main.js:11 hello, textContent and <strong>innerHTML</strong> 
+```
+
+
