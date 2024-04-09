@@ -1,31 +1,21 @@
 <!DOCTYPE html>
 <html lang="ja">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>study javascript</title>
+  <title>Main File</title>
   <link rel="stylesheet" href="https://unpkg.com/destyle.css@4.0.0/destyle.min.css">
-  <link rel="stylesheet" href="./style.css">
   <script src="./main.js" defer></script>
 </head>
-
 <body>
-  <div class="container">
-    <ul>
-      <li>
-        <ul id="product__list"></ul>
-      </li>
-    </ul>
-  </div>
-  <template id="product">
-    <li class="product__inner">
+  <ul id="product"></ul>
+  <template id="product-template">
+    <li class="product__list">
       <h2 class="product__name"></h2>
       <p class="product__description"></p>
       <span class="product__price"></span>
     </li>
   </template>
 </body>
-
 </html>
 

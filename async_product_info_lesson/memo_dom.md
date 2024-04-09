@@ -320,4 +320,6 @@ console.log(ws.innerHTML);
 //=> main.js:11 hello, textContent and <strong>innerHTML</strong> 
 ```
 
+## 14.2.2 要素の作成
+
 
