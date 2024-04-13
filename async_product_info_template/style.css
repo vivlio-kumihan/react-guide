@@ -1,16 +1,25 @@
 .container {
-  width: 100%;
-  height: 100vh;
   display: grid;
   place-content: center;
+  width: 100%;
 }
 
-h1, p, input {
-  margin-top: 10px;
+.product {
+  padding: 0 20px;
+  background-color: #eee;
 }
-
-input {
-  padding: 5px 10px;
-  border: 1px solid #aaa;
-  border-radius: 5px;
+.product__list:not(:first-of-type) {
+  margin-top: 20px;
+}
+.product__name, .product__description, .product__price {
+  margin-top: 7px;
+}
+.product__name {
+  margin-bottom: 7px;
+  padding-bottom: 7px;
+  font-weight: 900;
+  border-bottom: 1px solid #999;
+}
+.product__price {
+  display: inline-block;
 }/*# sourceMappingURL=style.css.map */
