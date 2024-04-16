@@ -1,0 +1,36 @@
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 50px;
+  width: 100%;
+  height: 120vh;
+}
+
+.product {
+  padding: 40px;
+  background-color: #eee;
+}
+.product__list:not(:first-of-type) {
+  margin-top: 20px;
+}
+.product__name, .product__description, .product__price {
+  margin-top: 7px;
+}
+.product__name {
+  margin-bottom: 7px;
+  padding-bottom: 7px;
+  font-weight: 900;
+  border-bottom: 1px solid #999;
+}
+.product__price {
+  display: inline-block;
+}
+
+.create-element {
+  font-weight: 900;
+}
+.create-element span {
+  display: block;
+  margin-top: 10px;
+}/*# sourceMappingURL=style.css.map */

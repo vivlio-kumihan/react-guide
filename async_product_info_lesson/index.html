@@ -5,10 +5,28 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Main File</title>
   <link rel="stylesheet" href="https://unpkg.com/destyle.css@4.0.0/destyle.min.css">
-  <script src="./main.js" defer></script>
+  <link rel="stylesheet" href="./styles/style.css">
+  <script src="./scripts/read_from_external_file_version.js" defer></script>
+  <script src="./scripts/main.js" defer></script>
 </head>
 <body>
-  <h1>hello, JavaScript!</h1>
+  <div class="container">
+    <ul id="product" class="product"></ul>
+    <p class="create-element">Hi, JavaScript!</p>
+    <div class="inner-html"></div>
+  </div>
 </body>
 </html>
+
+
+<!-- <template id="product-template">
+  <li class="product__list">
+    <h2 class="product__name"></h2>
+    <p class="product__description"></p>
+    <span class="product__price"></span>
+  </li>
+</template> -->
+
+
+
 
