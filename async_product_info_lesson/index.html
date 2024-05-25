@@ -6,41 +6,25 @@
   <title>Main File</title>
   <link rel="stylesheet" href="https://unpkg.com/destyle.css@4.0.0/destyle.min.css">
   <link rel="stylesheet" href="./styles/style.css">
-  <script src="./scripts/asyncLesson.js" defer></script>
-  <script src="./scripts/read_from_external_file_version.js" defer></script>
   <script src="./scripts/main.js" defer></script>
 </head>
 <body>
-  <div class="container">
-    <!-- <ul id="product" class="product"></ul>
-    <p class="create-element">Hi, JavaScript!</p>
-    <div class="inner-html"></div> -->
-    <div id="source">Source</div>
-    <section id="section">
-      <div class="wrap">
-        <h1 class="title">
-          <span>title</span>
-        </h1>
-        <ul class="list">
-          <li>1</li>
-          <li>2</li>
-          <li>3</li>
-        </ul>
-      </div>
-    </section>
+  <div id="container">
+    <header>
+      <h1 id="main-title"></h1>
+      <p class="sub-title"></p>
+    </header>
+    <main id="me" class="body">
+      <p class="child order-1" data-color="blue">1</p>
+      <p class="child order-2" data-color="red">2</p>
+      <p class="child order-3" data-color="orange">3</p>
+    </main>
+    <footer id="footer">
+      <form action="" id="comment" class="comment">
+        <textarea name="" id="comment-body" class="comment__body" value="hello"></textarea>
+        <input class="comment__input" type="submit" value="送信">
+      </form>
+    </footer>
   </div>
 </body>
 </html>
-
-
-<!-- <template id="product-template">
-  <li class="product__list">
-    <h2 class="product__name"></h2>
-    <p class="product__description"></p>
-    <span class="product__price"></span>
-  </li>
-</template> -->
-
-
-
-
