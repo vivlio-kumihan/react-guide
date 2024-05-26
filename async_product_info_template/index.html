@@ -9,17 +9,19 @@
   <script src="./main.js" defer></script>
 </head>
 <body>
-  <div class="container">
-    <ul id="product" class="product"></ul>
+  <div id="todo-container" class="todo">
+    <div class="create">
+      <input type="text" id="create-input" class="create__input" name="">
+      <button id="create-btn" class="create__btn">追加</button>
+      <ul id="todo-list" class="todo__list"></ul>
+    </div>
   </div>
+  <template id="todo-item-tmple" class="todo__item-tmpl">
+    <li class="todo__item">
+      <span class="todo__title"></span>
+      <input type="button" class="todo__btn delete" value="削除">
+      <input type="button" class="todo__btn complete" value="完了">
+    </li>
+  </template>
 </body>
 </html>
-
-
-<!-- <template id="product-template">
-  <li class="product__list">
-    <h2 class="product__name"></h2>
-    <p class="product__description"></p>
-    <span class="product__price"></span>
-  </li>
-</template> -->
