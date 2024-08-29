@@ -1,16 +1,45 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-   <script src="/libs/react.development.js"></script>
-   <script src="/libs/react-dom.development.js"></script>
-   <script src="/libs/babel-standalone.js"></script>
+  <script src="../../../../libs/react.development.js"></script>
+  <script src="../../../../libs/react-dom.development.js"></script>
+  <script src="../../../../libs/babel-standalone.js"></script>
 </head>
+
 <body>
-    <div id="app"></div>
-    <script type="text/babel">
-        const appEl = document.querySelector('#app');
-        const root = ReactDOM.createRoot(appEl);
-        root.render(<h1>こんにちは</h1>);
-    </script>
+  <!-- コンポーネント
+  画面の各構成要素をReactで定義したもの -->
+  <!-- JSの関数として定義する。 -->
+  <div id="app"></div>
+  <script type="text/babel">
+    const appEl = document.querySelector("#app");
+    const root = ReactDOM.createRoot(appEl);
+
+    // function Example() {
+    //     return <h1>Hello Components</h1>;
+    // }
+
+    // POINT コンポーネントの先頭は大文字とする
+    // POINT JSXが複数行の時は()で括る
+    // return の1行だけなので{}を取り去ることができる。
+    // {} アロー関数の波括弧は、関数の本文を入れるところです。
+    // () 何かのまとまりを括るところです。
+    const Example = () => (
+      <div>
+        <h1>Hello Components</h1>
+      </div>
+    );
+
+    const a = () => {
+      return;
+      ("戻り値");
+    };
+
+    console.log(a());
+
+    root.render(<Example />);
+  </script>
 </body>
+
 </html>

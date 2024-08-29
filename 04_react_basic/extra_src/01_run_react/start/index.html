@@ -1,9 +1,18 @@
 <!DOCTYPE html>
 <html>
 <head>
-   
+  <script src="../../../../libs/react.development.js"></script>
+  <script src="../../../../libs/react-dom.development.js"></script>
+  <script src="../../../../libs/babel-standalone.js"></script>
 </head>
 <body>
-    
+  <!-- マウント先 -->
+  <div id="app"></div>
+  <!-- ブラウザでReactを表現する方法 -->
+  <script type="text/babel">
+    const appEl = document.querySelector("#app");
+    const root = ReactDOM.createRoot(appEl);
+    root.render(<h1>hello</h1>);
+  </script>
 </body>
 </html>
