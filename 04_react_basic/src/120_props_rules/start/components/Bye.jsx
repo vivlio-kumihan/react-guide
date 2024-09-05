@@ -1,3 +1,4 @@
+// 1.
 const Bye = (props) => {
   return (
     <div>
@@ -5,5 +6,4 @@ const Bye = (props) => {
     </div>
   );
 };
-
 export default Bye;
