@@ -1,0 +1,8 @@
+.App-start .wrapper {
+  width: 100%;
+  padding: 1em;
+  border: 1px solid #333;
+  &.margin-top-1em {
+    margin-top: 1em;
+  }
+}

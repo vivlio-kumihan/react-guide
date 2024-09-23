@@ -14,14 +14,16 @@ const Example = () => {
         type="text"
         // onChangeイベントはJSX内で処理は完結する。
         onChange={(e) => {
-          console.log(e.target.value);
           setVal(e.target.value);
+          console.log("e.target.value", e.target.value);
+          console.log("val", val);
           // displayVal = e.target.value;
         }}
       />
       {/* なので、別のJSX内の変数の値に影響することはない。
           この変数を変更するにはコンポーネントが再度実行される必要がある。 */}
       = {val}
+      {console.log("val", val)}
     </>
   );
 };

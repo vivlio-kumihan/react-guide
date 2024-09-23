@@ -18,7 +18,7 @@ const Timer = () => {
     // console.log('init');
     let intervalId = null;
     intervalId = window.setInterval(() => {
-      console.log('interval called');
+      // console.log('interval called');
       setTime(prev => prev + 1);
     }, 1000);
     return () => {
@@ -27,17 +27,17 @@ const Timer = () => {
     }
   }, [])
   
-  useEffect(() => {
-    // console.log('updated');
+  // useEffect(() => {
+  //   // console.log('updated');
     
-    document.title = 'counter:' + time;
-    window.localStorage.setItem('time-key-end', time);
+  //   document.title = 'counter:' + time;
+  //   window.localStorage.setItem('time-key-end', time);
 
-    return () => {
-      // debugger
-      // console.log('updated end');
-    }
-  }, [time]);
+  //   return () => {
+  //     // debugger
+  //     // console.log('updated end');
+  //   }
+  // }, [time]);
 
   return (
     <h3>

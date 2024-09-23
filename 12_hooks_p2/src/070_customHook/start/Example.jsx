@@ -1,4 +1,15 @@
-import { useEffect, useState, useLayoutEffect } from "react";
+// カスタム・フック
+
+// * useStateなどReact Hookを内部で使用した関数（フック）のこと。
+// * 関数名はuse〓〓〓〓とする。
+
+// * useStateはコンポーネントのトップ・レベルで使うものなのだが、
+//   下位のコンポーネントにおいて、関数名はuse〓〓〓〓のカスタム・フック（関数）の中で使うことができる。
+
+// * useStateで定義した状態の操作を複数のコンポーネントで使うことができる。
+
+import { useState } from "react";
+import useTimer from "./useTimer";
 
 const Example = () => {
   const [isDisp, setIsDisp] = useState(true);
@@ -12,55 +23,7 @@ const Example = () => {
 }
 
 const Timer = () => {
-  const [time, setTime] = useState(0);
-  const [isRunning, setIsRunning] = useState(false);
-
-  useEffect(() => {
-    // console.log('init');
-    let intervalId = null;
-
-    if(isRunning) {
-      // console.log('timer start');
-
-      intervalId = window.setInterval(() => {
-        // console.log('interval running');
-        setTime(prev => prev + 1);
-      }, 1000);
-    }
-    
-    return () => {
-      window.clearInterval(intervalId)
-      // console.log('end');
-    }
-  }, [isRunning])
-  
-  useEffect(() => {
-    // // console.log('updated');
-    
-    document.title = 'counter:' + time;
-    window.localStorage.setItem('time-key', time);
-
-    return () => {
-      // debugger
-      // // console.log('updated end');
-    }
-  }, [time]);
-
-  useLayoutEffect(() => {
-    const _time = parseInt(window.localStorage.getItem('time-key'));
-    if(!isNaN(_time)) {
-      setTime(_time);
-    }
-  }, [])
-
-  const toggle = () => {
-    setIsRunning(prev => !prev);
-  }
-
-  const reset = () => {
-    setTime(0);
-    setIsRunning(false);
-  }
+  const { time, isRunning, toggle, reset } = useTimer();
 
   return (
     <>
@@ -73,7 +36,7 @@ const Timer = () => {
       <button onClick={reset}>リセット</button>
     </div>
     </>
-    );
+  );
 };
 
 export default Example;
