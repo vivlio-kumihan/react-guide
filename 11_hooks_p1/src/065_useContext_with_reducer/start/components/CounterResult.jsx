@@ -1,8 +1,20 @@
-// ////////
-// //  2. コンポーネント化する。
-// //     * オブジェクトはpropsで渡す。
+// // origin
+// const CounterReslut = ({ countAtCounterComp }) => {
 
-// const CounterReslut = ({ count }) => {
+//   return (
+//     <h3>{countAtCounterComp}</h3>
+//   );
+// };
+
+// export default CounterReslut;
+
+
+// // 1.
+// import { useCount } from "../context/CounterContext";
+
+// const CounterReslut = () => {
+//   const count = useCount();
+
 //   return (
 //     <h3>{count}</h3>
 //   );
@@ -10,50 +22,14 @@
 
 // export default CounterReslut;
 
-////////////////////////////////
 
-import { useContext } from "react";
-import { CountContext } from "../Example";
+import { useCount } from '../context/CounterContext';
 
 const CounterReslut = () => {
-  const [count] = useContext(CountContext);
-
+  const count = useCount();
   return (
     <h3>{count}</h3>
   );
 };
 
 export default CounterReslut;
-
-
-
-
-
-
-
-
-
-// // origin
-// //   * 状態はuseReducerで管理。
-// //   * オブジェクトはpropsで渡す。
-// //   * Contextを使わないバージョン。
-
-// const CounterResult = ({ state }) => {
-
-//   return <h3>{state}</h3>;
-// };
-
-// export default CounterResult;
-
-
-
-
-
-// import { useCounter } from "../context/CounterContext";
-
-// const CounterResult = () => {
-//   const state = useCounter();
-//   return <h3>{ state }</h3>;
-// };
-
-// export default CounterResult;
